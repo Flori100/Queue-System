@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QueueTicketController;
 use App\Http\Controllers\ProfileController;
 use App\Support\RoleRedirector;
@@ -14,27 +15,21 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        $tickets = auth()->user()
-            ->queueTickets()
-            ->with('assignedStaff:id,name')
-            ->latest()
-            ->get();
+    Route::get('/dashboard', [DashboardController::class, 'customer'])
+        ->middleware('role:customer')
+        ->name('dashboard');
 
-        return view('dashboard', compact('tickets'));
-    })->middleware('role:customer')->name('dashboard');
+    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
+        ->middleware('role:admin')
+        ->name('admin.dashboard');
 
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->middleware('role:admin')->name('admin.dashboard');
+    Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
+        ->middleware('role:staff')
+        ->name('staff.dashboard');
 
-    Route::get('/staff/dashboard', function () {
-        return view('staff.dashboard');
-    })->middleware('role:staff')->name('staff.dashboard');
-
-    Route::get('/reception/dashboard', function () {
-        return view('reception.dashboard');
-    })->middleware('role:receptionist')->name('reception.dashboard');
+    Route::get('/reception/dashboard', [DashboardController::class, 'reception'])
+        ->middleware('role:receptionist')
+        ->name('reception.dashboard');
 
     Route::prefix('queue')->group(function () {
         Route::get('/', [QueueTicketController::class, 'index'])->name('queue.index');

@@ -42,20 +42,20 @@
                         @csrf
 
                         <div>
-                            <x-input-label for="service" :value="__('Service')" />
+                            <x-input-label for="service_type" :value="__('Service')" />
                             <select
-                                id="service"
-                                name="service"
+                                id="service_type"
+                                name="service_type"
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 required
                             >
                                 @foreach (\App\Models\QueueTicket::SERVICES as $service)
-                                    <option value="{{ $service }}" @selected(old('service') === $service)>
+                                    <option value="{{ $service }}" @selected(old('service_type') === $service)>
                                         {{ str($service)->replace('-', ' ')->title() }}
                                     </option>
                                 @endforeach
                             </select>
-                            <x-input-error :messages="$errors->get('service')" class="mt-2" />
+                            <x-input-error :messages="$errors->get('service_type')" class="mt-2" />
                         </div>
 
                         <div>
@@ -133,7 +133,7 @@
                                         </span>
                                     </td>
                                     <td class="py-3 pr-4 text-gray-700">{{ $ticket->customer?->name ?? '-' }}</td>
-                                    <td class="py-3 pr-4 text-gray-700">{{ $ticket->assignedUser?->name ?? '-' }}</td>
+                                    <td class="py-3 pr-4 text-gray-700">{{ $ticket->assignedStaff?->name ?? '-' }}</td>
                                     @if ($canManageTickets)
                                         <td class="py-3 pr-4">
                                             <form method="POST" action="{{ route('queue.update-status', $ticket) }}" class="flex items-center gap-2">
