@@ -12,6 +12,15 @@
                     {{ __('Welcome, admin.') }}
                 </div>
             </div>
+
+            <div class="mt-6">
+                <a
+                    href="{{ route('queue.index') }}"
+                    class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                >
+                    {{ __('Open Queue Management') }}
+                </a>
+            </div>
         </div>
     </div>
 </x-app-layout>

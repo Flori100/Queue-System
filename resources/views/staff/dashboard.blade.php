@@ -9,7 +9,13 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    {{ __("Welcome to the staff dashboard.") }}
+                    <p>{{ __('Queue processing board for staff.') }}</p>
+                    <a
+                        href="{{ route('queue.index') }}"
+                        class="mt-4 inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                    >
+                        {{ __('Open Queue Board') }}
+                    </a>
                 </div>
             </div>
         </div>

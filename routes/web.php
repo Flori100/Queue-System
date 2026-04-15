@@ -1,15 +1,27 @@
 <?php
 
+use App\Http\Controllers\QueueTicketController;
 use App\Http\Controllers\ProfileController;
+use App\Support\RoleRedirector;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route(RoleRedirector::routeNameFor(auth()->user()));
+    }
+
     return view('welcome');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $tickets = auth()->user()
+            ->queueTickets()
+            ->with('assignedStaff:id,name')
+            ->latest()
+            ->get();
+
+        return view('dashboard', compact('tickets'));
     })->middleware('role:customer')->name('dashboard');
 
     Route::get('/admin/dashboard', function () {
@@ -23,6 +35,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/reception/dashboard', function () {
         return view('reception.dashboard');
     })->middleware('role:receptionist')->name('reception.dashboard');
+
+    Route::prefix('queue')->group(function () {
+        Route::get('/', [QueueTicketController::class, 'index'])->name('queue.index');
+        Route::post('/', [QueueTicketController::class, 'store'])
+            ->middleware('role:customer')
+            ->name('queue.store');
+        Route::patch('/{ticket}/status', [QueueTicketController::class, 'update'])
+            ->middleware('role:staff,receptionist,admin')
+            ->name('queue.update-status');
+        Route::patch('/{ticket}/cancel', [QueueTicketController::class, 'destroy'])
+            ->middleware('role:customer,staff,receptionist,admin')
+            ->name('queue.cancel');
+    });
 });
 
 Route::middleware('auth')->group(function () {

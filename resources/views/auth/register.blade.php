@@ -16,6 +16,25 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        <!-- Role -->
+        <div class="mt-4">
+            <x-input-label for="role" :value="__('Role')" />
+
+            <select
+                id="role"
+                name="role"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                required
+            >
+                <option value="customer" @selected(old('role', 'customer') === 'customer')>Customer</option>
+                <option value="receptionist" @selected(old('role') === 'receptionist')>Receptionist</option>
+                <option value="staff" @selected(old('role') === 'staff')>Staff</option>
+                <option value="admin" @selected(old('role') === 'admin')>Admin</option>
+            </select>
+
+            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+        </div>
+
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />

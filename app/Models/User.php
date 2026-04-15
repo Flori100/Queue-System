@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\QueueTicket;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -53,5 +55,10 @@ class User extends Authenticatable
             self::ROLE_RECEPTIONIST => 'reception.dashboard',
             default => 'dashboard',
         };
+    }
+
+    public function queueTickets(): HasMany
+    {
+        return $this->hasMany(QueueTicket::class, 'customer_id');
     }
 }
