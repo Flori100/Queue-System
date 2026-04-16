@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QueueTicketController;
+use App\Http\Controllers\SimpleQueueController;
 use App\Http\Controllers\ProfileController;
 use App\Support\RoleRedirector;
 use Illuminate\Support\Facades\Route;
@@ -43,7 +44,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->middleware('role:customer,staff,receptionist,admin')
             ->name('queue.cancel');
     });
+
+    Route::prefix('simple-queue')->name('simple-queue.')->group(function () {
+        Route::get('/customer', [SimpleQueueController::class, 'customer'])
+            ->middleware('role:customer')
+            ->name('customer');
+        Route::post('/customer/take-ticket', [SimpleQueueController::class, 'takeTicket'])
+            ->middleware('role:customer')
+            ->name('take-ticket');
+
+        Route::get('/staff', [SimpleQueueController::class, 'staff'])
+            ->middleware('role:staff,receptionist,admin')
+            ->name('staff');
+        Route::post('/staff/call-next', [SimpleQueueController::class, 'callNext'])
+            ->middleware('role:staff,receptionist,admin')
+            ->name('call-next');
+    });
 });
+
+Route::get('/simple-queue/display', [SimpleQueueController::class, 'display'])
+    ->name('simple-queue.display');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
