@@ -19,17 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:customer')
         ->name('dashboard');
 
-    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
-        ->middleware('role:admin')
-        ->name('admin.dashboard');
-
-    Route::get('/staff/dashboard', [DashboardController::class, 'staff'])
-        ->middleware('role:staff')
-        ->name('staff.dashboard');
-
-    Route::get('/reception/dashboard', [DashboardController::class, 'reception'])
-        ->middleware('role:receptionist')
-        ->name('reception.dashboard');
+    Route::get('/provider/dashboard', [DashboardController::class, 'provider'])
+        ->middleware('role:service_provider')
+        ->name('provider.dashboard');
 
     Route::prefix('queue')->group(function () {
         Route::get('/', [QueueTicketController::class, 'index'])->name('queue.index');
@@ -37,10 +29,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->middleware('role:customer')
             ->name('queue.store');
         Route::patch('/{ticket}/status', [QueueTicketController::class, 'update'])
-            ->middleware('role:staff,receptionist,admin')
+            ->middleware('role:service_provider')
             ->name('queue.update-status');
         Route::patch('/{ticket}/cancel', [QueueTicketController::class, 'destroy'])
-            ->middleware('role:customer,staff,receptionist,admin')
+            ->middleware('role:customer,service_provider')
             ->name('queue.cancel');
     });
 });

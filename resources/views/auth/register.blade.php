@@ -27,9 +27,7 @@
                 required
             >
                 <option value="customer" @selected(old('role', 'customer') === 'customer')>Customer</option>
-                <option value="receptionist" @selected(old('role') === 'receptionist')>Receptionist</option>
-                <option value="staff" @selected(old('role') === 'staff')>Staff</option>
-                <option value="admin" @selected(old('role') === 'admin')>Admin</option>
+                <option value="service_provider" @selected(old('role') === 'service_provider')>Service Provider</option>
             </select>
 
             <x-input-error :messages="$errors->get('role')" class="mt-2" />

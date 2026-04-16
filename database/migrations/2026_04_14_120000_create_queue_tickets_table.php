@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('ticket_number')->unique();
             $table->unsignedInteger('queue_number')->unique();
             $table->foreignId('customer_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('assigned_to')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('service_provider_id')->constrained('users')->cascadeOnDelete();
             $table->enum('service_type', ['general', 'billing', 'support', 'claims']);
             $table->enum('priority', ['low', 'normal', 'high'])->default('normal');
             $table->enum('status', ['waiting', 'called', 'serving', 'completed', 'cancelled'])->default('waiting')->index();

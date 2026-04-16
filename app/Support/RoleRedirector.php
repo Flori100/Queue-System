@@ -9,9 +9,7 @@ class RoleRedirector
     public static function pathFor(?User $user): string
     {
         return match ($user?->role) {
-            User::ROLE_ADMIN => '/admin/dashboard',
-            User::ROLE_STAFF => '/staff/dashboard',
-            User::ROLE_RECEPTIONIST => '/reception/dashboard',
+            User::ROLE_SERVICE_PROVIDER => '/provider/dashboard',
             default => '/dashboard',
         };
     }
@@ -19,9 +17,7 @@ class RoleRedirector
     public static function routeNameFor(?User $user): string
     {
         return match ($user?->role) {
-            User::ROLE_ADMIN => 'admin.dashboard',
-            User::ROLE_STAFF => 'staff.dashboard',
-            User::ROLE_RECEPTIONIST => 'reception.dashboard',
+            User::ROLE_SERVICE_PROVIDER => 'provider.dashboard',
             default => 'dashboard',
         };
     }

@@ -14,10 +14,12 @@ class QueueTicketTest extends TestCase
     public function test_customer_can_create_queue_ticket(): void
     {
         $customer = User::factory()->create(['role' => User::ROLE_CUSTOMER]);
+        $serviceProvider = User::factory()->create(['role' => User::ROLE_SERVICE_PROVIDER]);
 
         $this
             ->actingAs($customer)
             ->post(route('queue.store'), [
+                'service_provider_id' => $serviceProvider->id,
                 'service_type' => QueueTicket::SERVICE_BILLING,
                 'priority' => QueueTicket::PRIORITY_HIGH,
                 'notes' => 'Need billing assistance',
@@ -25,25 +27,27 @@ class QueueTicketTest extends TestCase
 
         $this->assertDatabaseHas('queue_tickets', [
             'customer_id' => $customer->id,
+            'service_provider_id' => $serviceProvider->id,
             'service_type' => QueueTicket::SERVICE_BILLING,
             'priority' => QueueTicket::PRIORITY_HIGH,
             'status' => QueueTicket::STATUS_WAITING,
         ]);
     }
 
-    public function test_staff_can_update_ticket_status(): void
+    public function test_service_provider_can_update_ticket_status(): void
     {
-        $staff = User::factory()->create(['role' => User::ROLE_STAFF]);
+        $serviceProvider = User::factory()->create(['role' => User::ROLE_SERVICE_PROVIDER]);
         $customer = User::factory()->create(['role' => User::ROLE_CUSTOMER]);
         $ticket = QueueTicket::create([
             'customer_id' => $customer->id,
+            'service_provider_id' => $serviceProvider->id,
             'service_type' => QueueTicket::SERVICE_GENERAL,
             'priority' => QueueTicket::PRIORITY_NORMAL,
             'status' => QueueTicket::STATUS_WAITING,
         ]);
 
         $response = $this
-            ->actingAs($staff)
+            ->actingAs($serviceProvider)
             ->patch(route('queue.update-status', $ticket), [
                 'status' => QueueTicket::STATUS_SERVING,
             ]);
@@ -53,7 +57,6 @@ class QueueTicketTest extends TestCase
         $this->assertDatabaseHas('queue_tickets', [
             'id' => $ticket->id,
             'status' => QueueTicket::STATUS_SERVING,
-            'assigned_to' => $staff->id,
         ]);
     }
 
@@ -64,6 +67,7 @@ class QueueTicketTest extends TestCase
 
         $ownerTicket = QueueTicket::create([
             'customer_id' => $owner->id,
+            'service_provider_id' => User::factory()->create(['role' => User::ROLE_SERVICE_PROVIDER])->id,
             'service_type' => QueueTicket::SERVICE_SUPPORT,
             'priority' => QueueTicket::PRIORITY_NORMAL,
             'status' => QueueTicket::STATUS_WAITING,
@@ -71,6 +75,7 @@ class QueueTicketTest extends TestCase
 
         $otherTicket = QueueTicket::create([
             'customer_id' => $other->id,
+            'service_provider_id' => User::factory()->create(['role' => User::ROLE_SERVICE_PROVIDER])->id,
             'service_type' => QueueTicket::SERVICE_CLAIMS,
             'priority' => QueueTicket::PRIORITY_LOW,
             'status' => QueueTicket::STATUS_WAITING,

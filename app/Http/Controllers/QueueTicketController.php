@@ -15,16 +15,12 @@ class QueueTicketController extends Controller
     {
         $user = $request->user();
 
-        $query = QueueTicket::query()->with(['customer:id,name', 'assignedStaff:id,name']);
+        $query = QueueTicket::query()->with(['customer:id,name', 'serviceProvider:id,name']);
 
         if ($user->role === User::ROLE_CUSTOMER) {
             $query->where('customer_id', $user->id);
-        } elseif ($user->role === User::ROLE_STAFF) {
-            $query->active()
-                ->where(function ($builder) use ($user): void {
-                    $builder->whereNull('assigned_to')
-                        ->orWhere('assigned_to', $user->id);
-                });
+        } elseif ($user->role === User::ROLE_SERVICE_PROVIDER) {
+            $query->where('service_provider_id', $user->id);
         }
 
         $tickets = $query->latest()->paginate(15);
@@ -49,11 +45,11 @@ class QueueTicketController extends Controller
             'summary' => $summary,
             'currentUser' => $user,
             'canCreateTickets' => $user->role === User::ROLE_CUSTOMER,
-            'canManageTickets' => in_array(
-                $user->role,
-                [User::ROLE_ADMIN, User::ROLE_STAFF, User::ROLE_RECEPTIONIST],
-                true
-            ),
+            'canManageTickets' => $user->role === User::ROLE_SERVICE_PROVIDER,
+            'serviceProviders' => User::query()
+                ->where('role', User::ROLE_SERVICE_PROVIDER)
+                ->orderBy('name')
+                ->get(['id', 'name']),
         ]);
     }
 
@@ -66,13 +62,20 @@ class QueueTicketController extends Controller
         }
 
         $payload = $request->validate([
+            'service_provider_id' => ['required', Rule::exists('users', 'id')],
             'service_type' => ['required', Rule::in(QueueTicket::SERVICES)],
             'notes' => ['nullable', 'string', 'max:500'],
             'priority' => ['required', Rule::in(QueueTicket::PRIORITIES)],
         ]);
 
+        $serviceProvider = User::query()
+            ->whereKey($payload['service_provider_id'])
+            ->where('role', User::ROLE_SERVICE_PROVIDER)
+            ->firstOrFail();
+
         $ticket = QueueTicket::create([
             'customer_id' => $user->id,
+            'service_provider_id' => $serviceProvider->id,
             'service_type' => $payload['service_type'],
             'status' => QueueTicket::STATUS_WAITING,
             'priority' => $payload['priority'],
@@ -88,7 +91,8 @@ class QueueTicketController extends Controller
     {
         $user = $request->user();
 
-        abort_unless(in_array($user->role, [User::ROLE_STAFF, User::ROLE_RECEPTIONIST, User::ROLE_ADMIN], true), 403);
+        abort_unless($user->role === User::ROLE_SERVICE_PROVIDER, 403);
+        abort_unless($ticket->service_provider_id === $user->id, 403);
 
         $payload = $request->validate([
             'status' => ['required', Rule::in([
@@ -97,6 +101,10 @@ class QueueTicketController extends Controller
                 QueueTicket::STATUS_COMPLETED,
             ])],
         ]);
+
+        if ($ticket->service_provider_id !== $user->id) {
+            abort(403);
+        }
 
         if ($ticket->isFinalized()) {
             return redirect()->route('queue.index')->with('status', "Ticket {$ticket->ticket_number} is already finalized.");
@@ -107,14 +115,9 @@ class QueueTicketController extends Controller
 
         if ($status === QueueTicket::STATUS_CALLED) {
             $attributes['called_at'] = now();
-
-            if (! $ticket->assigned_to && $user->role === User::ROLE_STAFF) {
-                $attributes['assigned_to'] = $user->id;
-            }
         }
 
         if ($status === QueueTicket::STATUS_SERVING) {
-            $attributes['assigned_to'] = $user->id;
             $attributes['served_at'] = now();
             $attributes['called_at'] = $ticket->called_at ?? now();
         }
@@ -122,10 +125,6 @@ class QueueTicketController extends Controller
         if ($status === QueueTicket::STATUS_COMPLETED) {
             $attributes['completed_at'] = now();
             $attributes['served_at'] = $ticket->served_at ?? now();
-
-            if (! $ticket->assigned_to && $user->role === User::ROLE_STAFF) {
-                $attributes['assigned_to'] = $user->id;
-            }
         }
 
         $ticket->update($attributes);
@@ -146,7 +145,8 @@ class QueueTicketController extends Controller
                 'Ticket cannot be cancelled once service has started.'
             );
         } else {
-            abort_unless(in_array($user->role, [User::ROLE_STAFF, User::ROLE_RECEPTIONIST, User::ROLE_ADMIN], true), 403);
+            abort_unless($user->role === User::ROLE_SERVICE_PROVIDER, 403);
+            abort_unless($ticket->service_provider_id === $user->id, 403);
         }
 
         if ($ticket->isFinalized()) {
