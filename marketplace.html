@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Discover and book local services—dining, grooming, fitness, rides, and more." />
+  <title>Bookly — Find & book services near you</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./tokens.css" />
+  <style>
+    :root {
+      --bg-page: hsl(var(--background));
+      --bg-card: hsl(var(--card));
+      --text: hsl(var(--foreground));
+      --text-muted: hsl(var(--muted-foreground));
+      --accent: hsl(var(--primary));
+      --accent-hover: color-mix(in hsl, hsl(var(--primary)), black 14%);
+      --accent-soft: color-mix(in hsl, hsl(var(--primary)) 12%, hsl(var(--background)));
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-pill: 999px;
+      --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-heading: "Space Grotesk", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --max: 1200px;
+      --nav-h: 64px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-weight: 400;
+      color: hsl(var(--foreground));
+      background: hsl(var(--background));
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      z-index: 100;
+      padding: 0.75rem 1rem;
+      background: hsl(var(--accent));
+      color: hsl(var(--primary-foreground));
+      border-radius: var(--radius-md);
+    }
+
+    .skip-link:focus {
+      left: 1rem;
+      top: 1rem;
+    }
+
+    /* —— Top bar —— */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0 1.25rem;
+      background: color-mix(in hsl, hsl(var(--background)) 88%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid hsl(var(--border));
+    }
+
+    .top-nav__inner {
+      width: 100%;
+      max-width: var(--max);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 1.125rem;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+
+    .logo__mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, hsl(var(--accent)), color-mix(in hsl, hsl(var(--primary)), white 24%));
+      display: grid;
+      place-items: center;
+      color: hsl(var(--primary-foreground));
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .search-wrap {
+      flex: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .market-query-box {
+      width: 100%;
+      height: 44px;
+      padding: 0 1rem 0 2.75rem;
+      border: 1px solid hsl(var(--border));
+      border-radius: var(--radius-pill);
+      background: var(--bg-card);
+      font-size: 0.9375rem;
+      color: var(--text);
+      box-shadow: var(--shadow-card);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .market-query-box::placeholder {
+      color: var(--text-muted);
+    }
+
+    .market-query-box:hover {
+      border-color: var(--border-hover);
+    }
+
+    .market-query-box:focus {
+      outline: none;
+      border-color: hsl(var(--ring));
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      display: grid;
+      place-items: center;
+      color: var(--text-muted);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .icon-btn:hover {
+      background: hsl(var(--muted));
+      color: var(--text);
+    }
+
+    .icon-btn:focus-visible {
+      outline: 2px solid hsl(var(--ring));
+      outline-offset: 2px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-pill);
+      background: var(--accent-soft);
+      color: hsl(var(--accent));
+      font-weight: 600;
+      font-size: 0.875rem;
+      display: grid;
+      place-items: center;
+      margin-left: 0.25rem;
+      border: 2px solid var(--bg-card);
+      box-shadow: var(--shadow-card);
+    }
+
+    /* —— Main —— */
+    .page {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+
+    .section-head {
+      margin-bottom: 1rem;
+    }
+
+    .section-head h1 {
+      font-size: 1.375rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.25rem;
+    }
+
+    .section-head p {
+      margin: 0;
+      font-size: 0.9375rem;
+      color: var(--text-muted);
+    }
+
+    /* —— Categories —— */
+    .categories {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 0.25rem 0 1.25rem;
+      margin: 0 -0.25rem;
+      padding-left: 0.25rem;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .categories::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .categories::-webkit-scrollbar-thumb {
+      background: hsl(var(--input));
+      border-radius: 3px;
+    }
+
+    .cat-btn {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.375rem;
+      min-width: 76px;
+      padding: 0.75rem 0.5rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid transparent;
+      background: var(--bg-card);
+      box-shadow: var(--shadow-card);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 500;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .cat-btn:hover {
+      color: var(--text);
+      background: color-mix(in hsl, hsl(var(--accent)) 22%, var(--bg-card));
+      box-shadow: var(--shadow-card-hover);
+      transform: translateY(-2px);
+    }
+
+    .cat-btn[aria-pressed="true"] {
+      border-color: color-mix(in hsl, hsl(var(--primary)) 38%, transparent);
+      background: var(--accent-soft);
+      color: hsl(var(--accent));
+      box-shadow: 0 0 0 1px color-mix(in hsl, hsl(var(--primary)) 22%, transparent);
+    }
+
+    .cat-btn:focus-visible {
+      outline: 2px solid hsl(var(--ring));
+      outline-offset: 2px;
+    }
+
+    .cat-btn__icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: hsl(var(--muted));
+      display: grid;
+      place-items: center;
+      color: var(--text);
+    }
+
+    .cat-btn[aria-pressed="true"] .cat-btn__icon {
+      background: hsl(var(--card));
+      color: hsl(var(--accent));
+    }
+
+    .cat-btn svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* —— Grid —— */
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 1024px) {
+      .service-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 560px) {
+      .top-nav__inner {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 0.75rem 0;
+      }
+
+      .top-nav {
+        height: auto;
+      }
+
+      .search-wrap {
+        order: 3;
+        flex: 1 1 100%;
+        max-width: none;
+        margin: 0;
+      }
+
+      .service-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .service-card {
+      background: hsl(var(--card));
+      color: hsl(var(--card-foreground));
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      border: 1px solid color-mix(in hsl, hsl(var(--border)) 88%, transparent);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.15s;
+    }
+
+    .service-card:hover,
+    .service-card:focus-within {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card-hover);
+      border-color: var(--border-hover);
+    }
+
+    .service-card:focus-visible {
+      outline: 2px solid hsl(var(--ring));
+      outline-offset: 3px;
+    }
+
+    .service-card__image {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: hsl(var(--muted));
+    }
+
+    .service-card__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .service-card__body {
+      padding: 0.625rem 0.75rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 0.25rem;
+    }
+
+    .service-card__title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin: 0;
+      line-height: 1.25;
+      color: inherit;
+    }
+
+    .service-card__meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: auto;
+      padding-top: 0.125rem;
+    }
+
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.875rem;
+      color: hsl(var(--muted-foreground));
+    }
+
+    .rating__value {
+      font-weight: 600;
+      color: hsl(var(--foreground));
+    }
+
+    .rating svg {
+      width: 16px;
+      height: 16px;
+      color: hsl(var(--foreground));
+      flex-shrink: 0;
+    }
+
+    .btn-book {
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid hsl(var(--border));
+      background: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+      font-size: 0.8125rem;
+      font-weight: 600;
+      transition: background 0.15s, border-color 0.15s, transform 0.12s;
+    }
+
+    .btn-book:hover {
+      background: color-mix(in hsl, hsl(var(--primary)), hsl(var(--foreground)) 12%);
+    }
+
+    .btn-book:active {
+      transform: scale(0.97);
+    }
+
+    .btn-book:focus-visible {
+      outline: 2px solid hsl(var(--ring));
+      outline-offset: 2px;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px dashed hsl(var(--border));
+      color: var(--text-muted);
+    }
+
+    .empty-state strong {
+      display: block;
+      color: var(--text);
+      margin-bottom: 0.35rem;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to services</a>
+
+  <header class="top-nav" role="banner">
+    <div class="top-nav__inner">
+      <a class="logo" href="#" aria-label="Bookly home">
+        <span class="logo__mark" aria-hidden="true">B</span>
+        <span>Bookly</span>
+      </a>
+
+      <div class="search-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z" />
+        </svg>
+        <label for="search" class="visually-hidden">Search services</label>
+        <input
+          id="search"
+          class="market-query-box"
+          type="search"
+          placeholder="Search services, barbers, rides…"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="nav-actions">
+        <button type="button" class="icon-btn" aria-label="Saved">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button type="button" class="icon-btn" aria-label="Notifications">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 8A6 6 0 106 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <span class="avatar" aria-hidden="true">JD</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="page" role="main">
+    <div class="section-head">
+      <h1>Explore near you</h1>
+      <p>Book trusted local spots in a few taps.</p>
+    </div>
+
+    <div class="categories" id="categories" role="group" aria-label="Filter by category"></div>
+
+    <div class="service-grid" id="grid" aria-live="polite"></div>
+  </main>
+
+  <script>
+    (function () {
+      var categories = [
+        { id: "all", label: "All", icon: "grid" },
+        { id: "barbers", label: "Groom", icon: "scissors" },
+        { id: "fitness", label: "Train", icon: "dumbbell" },
+        { id: "taxi", label: "Ride", icon: "car" },
+        { id: "spa", label: "Relax", icon: "spa" },
+        { id: "pets", label: "Pets", icon: "paw" },
+      ];
+
+      var services = [
+        { id: "2", category: "barbers", title: "Line Up Studio — cuts & hot towel", rating: 4.8, image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=800&q=80" },
+        { id: "3", category: "fitness", title: "Pulse HIIT — small group sessions", rating: 4.7, image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80" },
+        { id: "4", category: "taxi", title: "CityRide — on-demand rides", rating: 4.9, image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80" },
+        { id: "5", category: "spa", title: "Stillwater Spa — massage & sauna", rating: 4.9, image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80" },
+        { id: "7", category: "barbers", title: "The Gentleman’s Chair — beard styling", rating: 5.0, image: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80" },
+        { id: "8", category: "pets", title: "Happy Paws — grooming & daycare", rating: 4.8, image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=800&q=80" },
+        { id: "9", category: "fitness", title: "Flow Yoga Loft — vinyasa & mobility", rating: 4.8, image: "https://images.unsplash.com/photo-1544367567-0f2fcb51e627?w=800&q=80" },
+        { id: "10", category: "taxi", title: "Airport Express — flat-rate transfers", rating: 4.7, image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=80" },
+        { id: "12", category: "spa", title: "Glow Facial Bar — 30-minute glow", rating: 4.5, image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=800&q=80" },
+      ];
+
+      var icons = {
+        grid: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>',
+        utensils: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 3v9M16 3v9M12 3v18M5 3h3M16 3h3"/></svg>',
+        scissors: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"/></svg>',
+        dumbbell: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 5h2M6 19h2M16 5h2M16 19h2M8 5v14M16 5v14M4 9h4M16 9h4M4 15h4M16 15h4"/></svg>',
+        car: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 11l1-3h12l1 3M5 11h14v4H5v-4zM7 17h2M15 17h2"/></svg>',
+        spa: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3c-2 4-6 5-6 9a6 6 0 0012 0c0-4-4-5-6-9zM5 21h14"/></svg>',
+        paw: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="16" rx="4" ry="3"/><circle cx="7" cy="9" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="17" cy="9" r="2"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/></svg>',
+      };
+
+      var starSvg =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.26L22 9.27l-5 4.9L18.18 22 12 18.56 5.82 22 7 14.17l-5-4.9 7.1-1.01L12 2z"/></svg>';
+
+      var activeCategory = "all";
+      var searchQuery = "";
+
+      var catEl = document.getElementById("categories");
+      var gridEl = document.getElementById("grid");
+      var searchEl = document.getElementById("search");
+
+      function normalize(s) {
+        return (s || "").toLowerCase().trim();
+      }
+
+      function filtered() {
+        var q = normalize(searchQuery);
+        return services.filter(function (s) {
+          var catOk = activeCategory === "all" || s.category === activeCategory;
+          var textOk = !q || normalize(s.title).indexOf(q) !== -1;
+          return catOk && textOk;
+        });
+      }
+
+      function renderCategories() {
+        catEl.innerHTML = "";
+        categories.forEach(function (c, i) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "cat-btn";
+          btn.setAttribute("aria-pressed", c.id === activeCategory ? "true" : "false");
+          btn.setAttribute("data-category", c.id);
+          var iconWrap = document.createElement("span");
+          iconWrap.className = "cat-btn__icon";
+          iconWrap.innerHTML = icons[c.icon] || icons.grid;
+          var lab = document.createElement("span");
+          lab.textContent = c.label;
+          btn.appendChild(iconWrap);
+          btn.appendChild(lab);
+          btn.addEventListener("click", function (e) {
+            var category = e.currentTarget && e.currentTarget.dataset
+              ? e.currentTarget.dataset.category
+              : c.id;
+            if (!category) return;
+            window.location.href = "category.html?type=" + encodeURIComponent(category);
+          });
+          catEl.appendChild(btn);
+        });
+      }
+
+      function openService(s) {
+        var id = s && s.id ? String(s.id) : "";
+        if (!id) return;
+        window.location.href = "/business/" + encodeURIComponent(id);
+      }
+
+      function renderGrid() {
+        var list = filtered();
+        gridEl.innerHTML = "";
+        if (!list.length) {
+          var empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.innerHTML = "<strong>No matches</strong>Try another category or search term.";
+          gridEl.appendChild(empty);
+          return;
+        }
+
+        list.forEach(function (s) {
+          var card = document.createElement("article");
+          card.className = "service-card";
+          card.setAttribute("tabindex", "0");
+          card.setAttribute("role", "group");
+          card.setAttribute("aria-label", s.title);
+          card.setAttribute("data-id", s.id);
+
+          var imgWrap = document.createElement("div");
+          imgWrap.className = "service-card__image";
+          var img = document.createElement("img");
+          img.src = s.image;
+          img.alt = "";
+          img.loading = "lazy";
+          img.decoding = "async";
+          imgWrap.appendChild(img);
+
+          var body = document.createElement("div");
+          body.className = "service-card__body";
+          var h2 = document.createElement("h2");
+          h2.className = "service-card__title";
+          h2.textContent = s.title;
+
+          var meta = document.createElement("div");
+          meta.className = "service-card__meta";
+          var rating = document.createElement("div");
+          rating.className = "rating";
+          rating.setAttribute("aria-label", "Rating " + s.rating + " out of 5");
+          rating.innerHTML =
+            starSvg + '<span class="rating__value" aria-hidden="true">' + s.rating.toFixed(1) + "</span>";
+
+          var book = document.createElement("button");
+          book.type = "button";
+          book.className = "btn-book";
+          book.textContent = "Book";
+          book.addEventListener("click", function (e) {
+            e.stopPropagation();
+            openService(s);
+          });
+
+          meta.appendChild(rating);
+          meta.appendChild(book);
+          body.appendChild(h2);
+          body.appendChild(meta);
+
+          card.appendChild(imgWrap);
+          card.appendChild(body);
+
+          function activate(cardEl) {
+            var id = cardEl && cardEl.dataset ? cardEl.dataset.id : "";
+            if (!id) return;
+            window.location.href = "/business/" + encodeURIComponent(id);
+          }
+
+          card.addEventListener("click", function (e) {
+            if (e.target.closest(".btn-book")) return;
+            activate(e.currentTarget);
+          });
+
+          card.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (document.activeElement === book) return;
+              activate(e.currentTarget);
+            }
+          });
+
+          gridEl.appendChild(card);
+        });
+      }
+
+      searchEl.addEventListener("input", function () {
+        searchQuery = searchEl.value;
+        renderGrid();
+      });
+
+      renderCategories();
+      renderGrid();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Browse all listings in this category on QList." />
+    <title>Category – QList</title>
+    <link rel="icon" href="/logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Space+Grotesk:wght@600&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+        (function () {
+            try {
+                document.documentElement.classList.remove("dark");
+                document.documentElement.setAttribute("data-theme", "light");
+            } catch (e) {}
+        })();
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            background-color: hsl(var(--background));
+            color-scheme: light;
+        }
+        body {
+            font-family: var(--font-sans);
+            min-height: 100dvh;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            -webkit-font-smoothing: antialiased;
+        }
+        :root {
+            --radius-pill: 999px;
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 20px;
+            --container-max: 1320px;
+            /* Fixed header; hero search uses --search-tuck on #hero-search-shell for size + transform. */
+            --topbar-height: 64px;
+            /* At tuck=1: translateY pulls bar from below header into header band (sticky top must stay fixed). */
+            --hero-search-sticky-lift: 48px;
+            /* Vertical breathing when #topbar-search-slot is used (empty = hidden). */
+            --topbar-search-slot-pad-y: 4px;
+            /* Inherited by #hero-search-bar for tuck math everywhere (including when reparented into header). */
+            --search-tuck: 0;
+            --header-height: var(--topbar-height);
+            --page-bg-top: #e4f0f6;
+            --page-bg-bottom: #e4f0f6;
+            --qlist-section: #e4f0f6;
+            --shadow-depth: 0 1px 2px 0 rgb(10 15 30 / 0.06);
+            --shadow-depth-md: 0 4px 12px -2px rgb(10 15 30 / 0.1);
+            --card-elev-shadow: var(--shadow-depth);
+            /* Hero -> sticky: discrete UI motion (scroll-driven tuck avoids transition on transform/shadow). */
+            --search-motion-duration: 0.28s;
+            --search-motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .search-btn {
+            background-color: hsl(var(--cta)) !important;
+        }
+        .search-btn:hover {
+            background-color: color-mix(in hsl, hsl(var(--cta)), hsl(222 50% 8%) 14%) !important;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            min-height: 0;
+            gap: 12px;
+            overflow: visible;
+            border: none;
+        }
+        /* --search-tuck 0->1: scroll-smoothed shrink + transform (single bar in hero; no reparent). */
+        #hero-search-bar.search-bar,
+        .search-bar.search-bar--hero {
+            width: min(100%, calc(60rem - 26rem * var(--search-tuck)), calc(100vw - 40px));
+            max-width: none;
+            flex: 0 1 auto;
+            margin-left: auto;
+            margin-right: auto;
+            min-height: calc(3.375rem - 1.875rem * var(--search-tuck));
+            height: auto;
+            padding-top: calc(1.125rem - (1.125rem - 0.3125rem) * var(--search-tuck));
+            padding-bottom: calc(1.125rem - (1.125rem - 0.3125rem) * var(--search-tuck));
+            padding-left: calc(1.375rem - (1.375rem - 0.4375rem) * var(--search-tuck));
+            padding-right: calc(1.375rem - (1.375rem - 0.4375rem) * var(--search-tuck));
+            gap: calc(0.8125rem - (0.8125rem - 0.3125rem) * var(--search-tuck));
+            font-size: calc(1rem - (1rem - 0.6875rem) * var(--search-tuck));
+            background: linear-gradient(180deg, #ffffff 0%, rgb(252 252 253) 100%);
+            border-radius: 9999px;
+            border: 1px solid hsl(var(--border));
+            box-shadow:
+                0 1px 2px rgb(15 23 42 / 0.05),
+                0 4px 16px rgb(15 23 42 / 0.08),
+                0 14px 36px -10px rgb(15 23 42 / 0.12),
+                0 calc(2px * var(--search-tuck)) calc(20px * var(--search-tuck)) rgb(15 23 42 / 0.09);
+            /* Do not transition transform/box-shadow here: --search-tuck updates every frame while scrolling. */
+            transition: border-color var(--search-motion-duration) var(--search-motion-ease);
+        }
+        #hero-search-bar.search-bar:focus-within,
+        .search-bar.search-bar--hero:focus-within {
+            border-color: color-mix(in hsl, hsl(var(--ring)) 38%, hsl(var(--border)) 62%);
+            box-shadow:
+                0 1px 3px rgb(15 23 42 / 0.08),
+                0 8px 22px rgb(15 23 42 / 0.1),
+                0 20px 48px -12px rgb(15 23 42 / 0.14),
+                0 calc(2px * var(--search-tuck)) calc(26px * var(--search-tuck)) rgb(15 23 42 / 0.11);
+            transition:
+                border-color var(--search-motion-duration) var(--search-motion-ease),
+                box-shadow var(--search-motion-duration) var(--search-motion-ease);
+        }
+        .hero-search-host #hero-search-bar.search-bar {
+            position: relative;
+            z-index: 3;
+            margin-left: auto;
+            margin-right: auto;
+            transform: translateY(calc(-1 * var(--search-tuck) * var(--hero-search-sticky-lift)))
+                scale(calc(1 - 0.24 * var(--search-tuck)));
+            transform-origin: center center;
+            will-change: transform;
+        }
+        #hero-search-bar.search-bar .search-field {
+            min-height: calc(56px - (56px - 28px) * var(--search-tuck));
+            padding-left: calc(15px - (15px - 4px) * var(--search-tuck));
+            padding-right: calc(15px - (15px - 4px) * var(--search-tuck));
+        }
+        #hero-search-bar.search-bar .search-btn {
+            height: 40px;
+            width: 40px;
+            min-width: 40px;
+            padding: 0;
+            flex: 0 0 auto;
+        }
+        #hero-search-bar.search-bar .search-btn svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        .search-field {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 46px;
+            padding: 0 12px;
+            position: relative;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.15s ease, box-shadow 0.15s ease;
+        }
+        .search-field:hover {
+            box-shadow: var(--shadow-depth);
+            background: hsl(var(--muted) / 0.35);
+        }
+        .search-field + .search-field::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 30px;
+            background: hsl(var(--border));
+        }
+        .search-field:hover + .search-field::before,
+        .search-field:hover::before,
+        .search-field:hover + .hero-location-query-wrap + .current-location-wrap > .search-field::before,
+        .search-field:hover + .current-location-wrap > .search-field::before,
+        .services-picker-wrap:has(.search-field:hover) + .hero-location-query-wrap + .current-location-wrap > .search-field::before,
+        .services-picker-wrap:has(.search-field:hover) + .current-location-wrap > .search-field::before,
+        .current-location-wrap > .search-field:hover::before,
+        .current-location-wrap:hover + .date-picker-wrap > .search-field::before {
+            background: transparent;
+        }
+        .search-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 46px;
+            padding: 0 18px;
+            border: none;
+            border-radius: 999px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: hsl(var(--cta-foreground));
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.2s ease;
+            flex-shrink: 0;
+            align-self: center;
+        }
+        .search-btn:active {
+            transform: scale(0.98);
+        }
+        .search-field__label-stack {
+            min-width: 0;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        .search-field__text--sticky-compact {
+            display: none;
+        }
+        .hero-search-host #hero-search-bar .search-field__text--sticky-compact {
+            display: none !important;
+        }
+        .hero-search-host #hero-search-bar .search-field__text--sticky-full {
+            display: inline !important;
+        }
+        .current-location-wrap {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            position: relative;
+            z-index: 20;
+        }
+        .current-location-wrap > .search-field {
+            width: 100%;
+        }
+        .hero-location-query-wrap + .current-location-wrap > .search-field::before,
+        .current-location-wrap > .search-field::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 30px;
+            background: hsl(var(--border));
+        }
+        .current-location-wrap + .date-picker-wrap > .search-field::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 30px;
+            background: hsl(var(--border));
+        }
+        .date-picker-wrap {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            position: relative;
+            z-index: 20;
+        }
+        .date-picker-wrap > .search-field {
+            width: 100%;
+        }
+        .search-field__icon {
+            flex-shrink: 0;
+            width: 15px;
+            height: 15px;
+            color: hsl(var(--muted-foreground));
+        }
+        .search-field__text {
+            font-size: 0.8125rem;
+            color: hsl(var(--muted-foreground));
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        button.search-field {
+            font: inherit;
+            color: inherit;
+            margin: 0;
+            text-align: left;
+            border: none;
+            -moz-appearance: none;
+            appearance: none;
+            -webkit-appearance: none;
+            width: auto;
+            min-width: 0;
+        }
+        .hero-location-query-wrap {
+            flex: 0 1 168px;
+            min-width: 96px;
+            max-width: 220px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 0 10px 0 14px;
+            align-self: stretch;
+        }
+        .hero-location-query-wrap::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 30px;
+            background: hsl(var(--border));
+        }
+        .hero-location-query {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 0.8125rem;
+            outline: none;
+            color: hsl(var(--foreground));
+            min-width: 0;
+        }
+        .hero-location-query::-moz-placeholder {
+            color: hsl(var(--muted-foreground));
+        }
+        .hero-location-query::placeholder {
+            color: hsl(var(--muted-foreground));
+        }
+        .hero-location-query--loading {
+            opacity: 0.55;
+        }
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .category-shell {
+            max-width: min(1680px, 100%);
+            margin: 0 auto;
+            padding: clamp(18px, 3vw, 28px) clamp(16px, 3vw, 32px) 56px;
+        }
+        .category-top {
+            margin-bottom: clamp(18px, 2.5vw, 28px);
+        }
+        .category-back {
+            display: inline-block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: hsl(var(--muted-foreground));
+            margin-bottom: 10px;
+        }
+        .category-back:hover {
+            color: hsl(var(--foreground));
+        }
+        .category-title {
+            font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+        }
+        .category-split {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(340px, 42vw);
+            gap: clamp(20px, 2.5vw, 36px);
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .category-split {
+                grid-template-columns: 1fr;
+            }
+        }
+        .category-page-empty {
+            margin-top: 12px;
+            font-size: 0.9375rem;
+            color: hsl(var(--muted-foreground));
+            max-width: 42ch;
+        }
+        .category-controls {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: clamp(14px, 2vw, 20px);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: hsl(var(--background) / 0.94);
+            backdrop-filter: blur(6px);
+            padding: 10px 0;
+        }
+        .category-sort {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: hsl(var(--muted-foreground));
+            font-size: 0.8125rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .category-sort select {
+            border: 1px solid hsl(var(--border) / 0.75);
+            border-radius: 999px;
+            background: hsl(var(--card));
+            color: hsl(var(--foreground));
+            font-size: 0.875rem;
+            padding: 8px 12px;
+            min-height: 36px;
+            cursor: pointer;
+        }
+        .category-sort select:focus-visible {
+            outline: 2px solid hsl(var(--ring));
+            outline-offset: 1px;
+        }
+        .category-chip-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            scrollbar-width: thin;
+        }
+        .category-chip-row::-webkit-scrollbar {
+            height: 6px;
+        }
+        .category-chip-row::-webkit-scrollbar-thumb {
+            background: hsl(var(--border));
+            border-radius: 999px;
+        }
+        .category-chip {
+            border: 1px solid hsl(var(--border) / 0.75);
+            border-radius: 999px;
+            background: hsl(var(--card));
+            color: hsl(var(--foreground));
+            font-size: 0.875rem;
+            padding: 8px 12px;
+            min-height: 34px;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+        }
+        .category-chip:hover {
+            border-color: hsl(var(--primary) / 0.5);
+            background: hsl(var(--primary) / 0.12);
+        }
+        .category-chip.is-active {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            border-color: hsl(var(--primary));
+        }
+        .category-chip:focus-visible {
+            outline: 2px solid hsl(var(--ring));
+            outline-offset: 1px;
+        }
+        .category-clear-filters {
+            border: 1px solid hsl(var(--border) / 0.75);
+            border-radius: 999px;
+            background: transparent;
+            color: hsl(var(--muted-foreground));
+            font-size: 0.8125rem;
+            font-weight: 500;
+            padding: 8px 12px;
+            min-height: 34px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+        }
+        .category-clear-filters:hover {
+            border-color: hsl(var(--primary) / 0.5);
+            color: hsl(var(--primary));
+            background: hsl(var(--primary) / 0.12);
+        }
+        .category-clear-filters:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+        .category-clear-filters:focus-visible {
+            outline: 2px solid hsl(var(--ring));
+            outline-offset: 1px;
+        }
+        @media (max-width: 860px) {
+            .category-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        /* Listing grid: 2 columns beside the map (desktop); single column on small phones */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: clamp(18px, 2.2vw, 28px);
+            padding: 8px 4px 2.5rem;
+            align-items: start;
+            min-width: 0;
+        }
+        .category-result-feedback {
+            margin: 4px 2px 10px;
+            font-size: 0.8125rem;
+            color: hsl(var(--muted-foreground));
+            font-weight: 500;
+        }
+        @media (max-width: 520px) {
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .category-map {
+            border-radius: 16px;
+            border: 1px solid hsl(var(--border) / 0.55);
+            background: linear-gradient(
+                160deg,
+                hsl(var(--muted) / 0.28) 0%,
+                hsl(var(--card)) 55%,
+                hsl(var(--muted) / 0.2) 100%
+            );
+            min-height: min(52dvh, 420px);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+        }
+        @media (min-width: 901px) {
+            .category-map {
+                position: sticky;
+                top: 100px;
+                align-self: start;
+                height: 80vh;
+                min-height: 80vh;
+            }
+        }
+        .category-map__canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: inherit;
+        }
+        .category-map__canvas[hidden] {
+            display: none !important;
+        }
+        .leaflet-container {
+            font-family: inherit;
+            border-radius: inherit;
+        }
+        .qlist-map-marker {
+            background: transparent !important;
+            border: none !important;
+        }
+        .qlist-map-marker .qlist-map-pin-inner {
+            width: 14px;
+            height: 14px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background: linear-gradient(160deg, #1e293b, #0f172a);
+            border: 2px solid #fff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.22);
+            transform-origin: center center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .qlist-map-marker:hover .qlist-map-pin-inner,
+        .qlist-map-marker.qlist-map-marker--highlight .qlist-map-pin-inner {
+            transform: scale(1.14);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.3);
+        }
+        .category-map__caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1100;
+            padding: 12px 14px;
+            font-size: 0.8125rem;
+            color: hsl(var(--muted-foreground));
+            pointer-events: none;
+            background: linear-gradient(transparent, hsl(var(--card) / 0.94));
+        }
+    </style>
+</head>
+<body>
+    <main class="category-shell">
+        <header class="category-top">
+            <a href="./index.html" class="category-back">← Back to home</a>
+            <h1 class="category-title" id="category-page-title">Category</h1>
+            <div class="hero-search-host flex w-full justify-start" id="hero-search-host">
+                <div id="hero-search-bar-anchor">
+                    <div class="max-w-5xl mx-auto mt-6 px-4">
+                    <form
+                        id="hero-search-bar"
+                        class="search-bar search-bar--hero flex items-center rounded-full bg-white shadow-sm w-full"
+                        role="search"
+                        aria-label="Find appointments"
+                        onsubmit="event.preventDefault()"
+                    >
+                        <div class="hero-location-query-wrap">
+                            <input
+                                type="text"
+                                id="hero-location-query"
+                                class="hero-location-query"
+                                placeholder="City or area"
+                                aria-label="City or area"
+                                autocomplete="address-level2"
+                                maxlength="120"
+                            />
+                        </div>
+
+                        <div class="current-location-wrap">
+                            <button
+                                type="button"
+                                class="search-field"
+                                id="current-location-btn"
+                                aria-label="Filter businesses by your current city. Click again to show all."
+                            >
+                                <svg class="search-field__icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span class="search-field__label-stack">
+                                    <span class="search-field__text search-field__text--sticky-full">Current location</span>
+                                    <span class="search-field__text search-field__text--sticky-compact" aria-hidden="true">Location</span>
+                                </span>
+                            </button>
+                            <div
+                                class="location-preview-card rounded-2xl"
+                                id="location-preview-card"
+                                hidden
+                                aria-live="polite"
+                            >
+                                <div class="location-preview-card__map">
+                                    <div
+                                        id="location-preview-map"
+                                        role="img"
+                                        aria-label="Map centered on your location"
+                                    ></div>
+                                </div>
+                                <p class="location-preview-card__label" id="location-preview-label"></p>
+                            </div>
+                        </div>
+
+                        <div class="date-picker-wrap">
+                            <button
+                                type="button"
+                                class="search-field"
+                                id="date-picker-btn"
+                                aria-haspopup="dialog"
+                                aria-expanded="false"
+                                aria-controls="date-picker-dropdown"
+                                aria-label="Choose appointment date. Any time."
+                            >
+                                <svg class="search-field__icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <span class="search-field__label-stack">
+                                    <span class="search-field__text search-field__text--sticky-full" id="date-picker-label-full">Any time</span>
+                                    <span class="search-field__text search-field__text--sticky-compact" id="date-picker-label-compact" aria-hidden="true">Time</span>
+                                </span>
+                            </button>
+                            <div
+                                class="date-picker-dropdown"
+                                id="date-picker-dropdown"
+                                role="dialog"
+                                aria-modal="false"
+                                aria-label="Select a date"
+                                hidden
+                            >
+                                <div class="date-picker__header">
+                                    <button type="button" class="date-picker__nav" id="date-picker-prev" aria-label="Previous month">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <polyline points="15 18 9 12 15 6"></polyline>
+                                        </svg>
+                                    </button>
+                                    <div class="date-picker__month-year">
+                                        <label class="visually-hidden" for="date-picker-month">Month</label>
+                                        <select id="date-picker-month" class="date-picker__select" aria-label="Month"></select>
+                                        <label class="visually-hidden" for="date-picker-year">Year</label>
+                                        <select id="date-picker-year" class="date-picker__select" aria-label="Year"></select>
+                                    </div>
+                                    <button type="button" class="date-picker__nav" id="date-picker-next" aria-label="Next month">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div class="date-picker__weekdays" aria-hidden="true">
+                                    <span class="date-picker__weekday">Sun</span>
+                                    <span class="date-picker__weekday">Mon</span>
+                                    <span class="date-picker__weekday">Tue</span>
+                                    <span class="date-picker__weekday">Wed</span>
+                                    <span class="date-picker__weekday">Thu</span>
+                                    <span class="date-picker__weekday">Fri</span>
+                                    <span class="date-picker__weekday">Sat</span>
+                                </div>
+                                <div class="date-picker__grid" id="date-picker-grid" role="grid" aria-label="Days"></div>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="search-btn w-10 h-10 flex items-center justify-center rounded-full"
+                            aria-label="Search"
+                        >
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="11" cy="11" r="7"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <span class="visually-hidden">Search</span>
+                        </button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+            <p id="category-page-empty" class="category-page-empty" hidden role="status"></p>
+        </header>
+        <section class="category-controls" aria-label="Sort and filters">
+            <label class="category-sort">
+                Sort
+                <select id="category-sort">
+                    <option value="top-rated">Top rated</option>
+                    <option value="nearest">Nearest</option>
+                    <option value="most-popular">Most popular</option>
+                </select>
+            </label>
+            <div class="category-chip-row" role="group" aria-label="Quick filters">
+                <button type="button" class="category-chip" data-chip-filter="distance-5">Within 5km</button>
+                <button type="button" class="category-chip" data-chip-filter="distance-10">Within 10km</button>
+                <button type="button" class="category-chip" data-chip-filter="distance-20">Within 20km</button>
+                <button type="button" class="category-chip" data-chip-filter="rating-45">Rating 4.5+</button>
+                <button type="button" class="category-chip" data-chip-filter="available-today">Available today</button>
+                <button type="button" class="category-clear-filters" id="category-clear-filters" disabled>Clear filters</button>
+            </div>
+        </section>
+        <div class="category-split">
+            <div id="mainContent">
+                <p id="category-result-feedback" class="category-result-feedback" aria-live="polite">0 results found</p>
+                <div id="category-page-grid" class="category-grid qlist-trending-place-cards" aria-live="polite"></div>
+            </div>
+            <aside class="category-map" aria-label="Map of businesses in this category">
+                <div
+                    id="map"
+                    class="category-map__canvas"
+                    role="application"
+                    aria-label="Map of listings in this category"
+                ></div>
+                <p id="category-page-map-caption" class="category-map__caption">Map</p>
+            </aside>
+        </div>
+    </main>
+    <script src="./qlist-auth-standalone.js"></script>
+    <script type="module" src="/src/entry.js"></script>
+    <script type="module" src="./src/categoryPage.js"></script>
+</body>
+</html>

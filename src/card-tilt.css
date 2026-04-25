@@ -1,0 +1,22 @@
+/* Global HTML card tilt helpers (see cardTilt.js). */
+
+.place-card.qlist-tilt--active,
+.search-field.bg-card.qlist-tilt--active {
+  z-index: 4;
+  transition-property: border-color, background-color, color, opacity;
+}
+
+.place-card.qlist-tilt--active {
+  /* Let JS own box-shadow while interacting so the lift tracks tilt smoothly. */
+  transition-duration: 0.25s;
+  transition-timing-function: ease-out;
+}
+
+.search-field.bg-card.qlist-tilt--active {
+  transition-duration: 0.25s;
+  transition-timing-function: ease-out;
+}
+
+.cards-slider__track .place-card.qlist-tilt--active {
+  z-index: 5;
+}

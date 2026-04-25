@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bento layout</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="./tokens.css" />
+  <style>
+    :root {
+      --bg: hsl(var(--background));
+      --surface: hsl(var(--card));
+      --surface-hover: color-mix(in hsl, hsl(var(--accent)) 38%, hsl(var(--card)));
+      --text: hsl(var(--foreground));
+      --text-muted: hsl(var(--muted-foreground));
+      --accent-soft: color-mix(in hsl, hsl(var(--primary)) 14%, transparent);
+      --radius: 16px;
+      --gap: 14px;
+      --pad: clamp(16px, 4vw, 28px);
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+      --font-heading: "Space Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    body 
+    {
+      font-family: var(--font);
+      font-weight: 400;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: var(--pad);
+    }
+
+    .page__head {
+      margin-bottom: 24px;
+    }
+
+    .page__eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .page__lead {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+      max-width: 42ch;
+    }
+
+    /* ---------- Bento grid ---------- */
+    .bento {
+      display: grid;
+      gap: var(--gap);
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: minmax(120px, auto);
+    }
+
+    .bento__item {
+      position: relative;
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: hsl(var(--card-foreground));
+      border: 1px solid hsl(var(--border));
+      padding: 20px;
+      overflow: hidden;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .bento__item:hover,
+    .bento__item:focus-within {
+      background: var(--surface-hover);
+      color: hsl(var(--accent-foreground));
+      border-color: var(--border-hover);
+    }
+
+    .bento__item:focus-visible {
+      outline: 2px solid hsl(var(--ring));
+      outline-offset: 2px;
+    }
+
+    .bento__label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .bento__title {
+      font-family: var(--font-heading);
+      font-size: 1.0625rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .bento__text {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Desktop spans */
+    .bento__item--hero {
+      grid-column: span 2;
+      grid-row: span 2;
+      min-height: 260px;
+      background: hsl(var(--card));
+      border-color: hsl(var(--border));
+    }
+
+    .bento__item--hero .bento__title {
+      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+    }
+
+    .bento__item--wide {
+      grid-column: span 2;
+    }
+
+    .bento__item--tall {
+      grid-row: span 2;
+      min-height: 220px;
+    }
+
+    .bento__stat {
+      font-size: clamp(2rem, 4vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    .bento__pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: hsl(var(--accent));
+      color: hsl(var(--accent-foreground));
+    }
+
+    .bento__decor {
+      display: none;
+    }
+
+    /* ---------- Mobile: single column ---------- */
+    @media (max-width: 700px) {
+      .bento {
+        grid-template-columns: 1fr;
+        grid-auto-rows: auto;
+      }
+
+      .bento__item--hero,
+      .bento__item--wide,
+      .bento__item--tall {
+        grid-column: span 1;
+        grid-row: span 1;
+        min-height: unset;
+      }
+
+      .bento__item--hero {
+        min-height: 200px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bento__item {
+        transition: none;
+      }
+    }
+
+    [data-bento-card][data-pulse="1"] {
+      transform: scale(0.985);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="page__head">
+      <p class="page__eyebrow">Layout</p>
+      <h1>Bento grid</h1>
+      <p class="page__lead">
+        CSS Grid with spanning cells. Below <strong>700px</strong> width, the grid collapses to a single column and span rules reset.
+      </p>
+    </header>
+
+    <section class="bento" id="bento" aria-label="Feature highlights">
+      <article class="bento__item bento__item--hero" tabindex="0" data-bento-card>
+        <span class="bento__decor" aria-hidden="true"></span>
+        <p class="bento__label">Overview</p>
+        <h2 class="bento__title">One surface, many stories</h2>
+        <p class="bento__text">
+          Hero tiles span two columns and two rows on desktop. On mobile they stack in document order as full-width blocks.
+        </p>
+        <span class="bento__pill" id="bento-width-readout" aria-live="polite">Viewport: —</span>
+      </article>
+
+      <article class="bento__item" tabindex="0" data-bento-card>
+        <p class="bento__label">Metric</p>
+        <p class="bento__stat" data-count="24">0</p>
+        <p class="bento__text">Active modules (animated on load).</p>
+      </article>
+
+      <article class="bento__item" tabindex="0" data-bento-card>
+        <p class="bento__label">Speed</p>
+        <h2 class="bento__title">Sub-100ms</h2>
+        <p class="bento__text">Typical interaction latency for core flows.</p>
+      </article>
+
+      <article class="bento__item bento__item--tall" tabindex="0" data-bento-card>
+        <p class="bento__label">Stack</p>
+        <h2 class="bento__title">HTML · CSS · JS</h2>
+        <p class="bento__text">
+          No framework required. Grid handles layout; a short script handles the width readout and a light count-up for the stat tile.
+        </p>
+      </article>
+
+      <article class="bento__item bento__item--wide" tabindex="0" data-bento-card>
+        <p class="bento__label">Wide tile</p>
+        <h2 class="bento__title">Spans two columns on desktop</h2>
+        <p class="bento__text">
+          Use for timelines, code snippets, or comparison tables. On mobile it becomes one full-width row like every other cell.
+        </p>
+      </article>
+
+      <article class="bento__item" tabindex="0" data-bento-card>
+        <p class="bento__label">Note</p>
+        <h2 class="bento__title">Tab order</h2>
+        <p class="bento__text">Cards are focusable for keyboard users.</p>
+      </article>
+
+      <article class="bento__item" tabindex="0" data-bento-card>
+        <p class="bento__label">Tip</p>
+        <h2 class="bento__title">Reorder on mobile</h2>
+        <p class="bento__text">Change HTML order or use <code style="font-size:0.8em;color:hsl(var(--foreground));">order</code> in a flex wrapper if you need a different mobile sequence.</p>
+      </article>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      var readout = document.getElementById("bento-width-readout");
+      var grid = document.getElementById("bento");
+
+      function updateReadout() {
+        if (!readout) return;
+        var w = window.innerWidth;
+        var mode = w <= 700 ? "single column" : "bento grid";
+        readout.textContent = "Viewport: " + w + "px · " + mode;
+      }
+
+      updateReadout();
+      window.addEventListener("resize", function () {
+        window.requestAnimationFrame(updateReadout);
+      });
+
+      /* Count-up for stat tile */
+      var stat = document.querySelector("[data-count]");
+      if (stat) {
+        var target = parseInt(stat.getAttribute("data-count"), 10) || 0;
+        var prefersReduced =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (prefersReduced) {
+          stat.textContent = String(target);
+        } else {
+          var start = performance.now();
+          var duration = 900;
+          function tick(now) {
+            var t = Math.min(1, (now - start) / duration);
+            var eased = 1 - Math.pow(1 - t, 3);
+            stat.textContent = String(Math.round(eased * target));
+            if (t < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        }
+      }
+
+      /* Light click feedback on cards (optional) */
+      if (grid) {
+        grid.addEventListener("click", function (e) {
+          var card = e.target.closest("[data-bento-card]");
+          if (!card || !grid.contains(card)) return;
+          card.dataset.pulse = "1";
+          window.setTimeout(function () {
+            delete card.dataset.pulse;
+          }, 200);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

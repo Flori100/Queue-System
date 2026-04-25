@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 900 140" role="img" aria-labelledby="qlistTitle">
+  <title id="qlistTitle">QList</title>
+  <!-- Pixel wordmark from provided brand sheet (crop only). Geometry unchanged; blue stroke = Q check tail only. -->
+  <image width="900" height="140" preserveAspectRatio="xMidYMid meet" xlink:href="qlist-wordmark.jpg" href="qlist-wordmark.jpg" />
+  <path
+    d="M 436 54 L 452 66 L 468 48"
+    fill="none"
+    stroke="#3B82F6"
+    stroke-width="3.15"
+    stroke-linecap="butt"
+    stroke-linejoin="miter"
+    stroke-miterlimit="4"
+  />
+</svg>

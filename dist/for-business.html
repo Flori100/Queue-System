@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Register your business on QList — add services, hours, and go live when you are ready." />
+    <title>List your business – QList</title>
+    <link rel="icon" href="./logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@600&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+        (function () {
+            try {
+                document.documentElement.classList.remove("dark");
+                document.documentElement.setAttribute("data-theme", "light");
+            } catch (e) {}
+        })();
+    </script>
+    <style>
+        :root {
+            --radius-sm: 10px;
+            --topbar-height: 48px;
+            --container-max: 1120px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: hsl(var(--background));
+            color-scheme: light;
+        }
+
+        html:not(.dark),
+        html:not(.dark) body {
+            background-color: hsl(var(--background)) !important;
+        }
+
+        html.dark {
+            color-scheme: dark;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            min-height: 100dvh;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: inherit;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            height: var(--topbar-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 0 18px 0 20px;
+            border-bottom: 1px solid rgb(255 255 255 / 0.1);
+            box-shadow: 0 1px 0 rgb(0 0 0 / 0.12);
+            background-color: #0a0f1e !important;
+            color: #ffffff;
+        }
+
+        .topbar > .logo {
+            display: inline-flex;
+            align-items: center;
+            line-height: 0;
+        }
+
+        .topbar .pill-btn:not(.pill-btn--primary) {
+            color: #ffffff !important;
+            background-color: transparent !important;
+            border: 1px solid rgb(255 255 255 / 0.35);
+        }
+
+        .topbar .pill-btn:not(.pill-btn--primary):hover {
+            background-color: rgb(255 255 255 / 0.1) !important;
+            border-color: rgb(255 255 255 / 0.5);
+        }
+
+        .topbar .pill-btn--primary {
+            background-color: #ffffff !important;
+            color: #0a0f1e !important;
+            border-color: #ffffff !important;
+        }
+
+        .topbar .pill-btn--primary:hover {
+            background-color: color-mix(in srgb, #ffffff 92%, #0a0f1e) !important;
+            color: #0a0f1e !important;
+        }
+
+        .topbar__actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pill-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            height: 34px;
+            padding: 0 12px;
+            border: 1px solid #0a0f1e;
+            border-radius: 12px;
+            background: transparent;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: #0a0f1e;
+            transition:
+                background 0.2s ease,
+                border-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .pill-btn:hover {
+            background: color-mix(in srgb, #0a0f1e 7%, transparent);
+            color: #0a0f1e;
+        }
+
+        .pill-btn--primary {
+            border-color: #0a0f1e;
+            background: #0a0f1e;
+            color: #ffffff;
+        }
+
+        .pill-btn--primary:hover {
+            background: color-mix(in srgb, #0a0f1e 88%, #ffffff);
+            color: #ffffff;
+        }
+
+        .pill-btn--ghost {
+            background: transparent;
+        }
+
+        .pill-btn--danger {
+            color: hsl(var(--destructive));
+            border-color: color-mix(in hsl, hsl(var(--destructive)) 35%, hsl(var(--border)));
+        }
+
+        .pill-btn--sm {
+            height: 30px;
+            padding: 0 10px;
+            font-size: 0.75rem;
+        }
+
+        .fb-wrap {
+            max-width: var(--container-max);
+            margin: 0 auto;
+            padding: 20px clamp(16px, 4vw, 32px) 48px;
+        }
+
+        .fb-head {
+            margin-bottom: 20px;
+        }
+
+        .fb-head h1 {
+            font-size: clamp(1.125rem, 2.5vw, 1.375rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+
+        .fb-head p {
+            font-size: 0.8125rem;
+            color: hsl(var(--muted-foreground));
+            max-width: 52ch;
+            line-height: 1.45;
+        }
+
+        .fb-grid {
+            display: grid;
+            gap: 20px;
+            align-items: start;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 960px) {
+            .fb-grid {
+                grid-template-columns: 1fr minmax(280px, 340px);
+            }
+        }
+
+        .fb-card {
+            border: 1px solid hsl(var(--border));
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            background: hsl(var(--card));
+            color: hsl(var(--card-foreground));
+            padding: 18px 20px 20px;
+            margin-bottom: 16px;
+        }
+
+        .fb-card--sticky {
+            position: sticky;
+            top: calc(var(--topbar-height) + 16px);
+        }
+
+        .fb-section-title {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: hsl(var(--muted-foreground));
+            margin-bottom: 14px;
+        }
+
+        .fb-field {
+            margin-bottom: 14px;
+        }
+
+        .fb-field:last-child {
+            margin-bottom: 0;
+        }
+
+        .fb-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: hsl(var(--foreground));
+        }
+
+        .fb-hint {
+            font-size: 0.6875rem;
+            color: hsl(var(--muted-foreground));
+            margin-top: 4px;
+        }
+
+        .fb-input,
+        .fb-select {
+            width: 100%;
+            font: inherit;
+            font-size: 0.875rem;
+            padding: 9px 11px;
+            border-radius: 8px;
+            border: 1px solid hsl(var(--input));
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+
+        .fb-input:focus,
+        .fb-select:focus {
+            outline: 2px solid color-mix(in hsl, hsl(var(--ring)) 35%, transparent);
+            outline-offset: 0;
+        }
+
+        .fb-upload-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .fb-upload-preview {
+            width: 88px;
+            height: 88px;
+            border-radius: 10px;
+            border: 1px dashed hsl(var(--border));
+            background: hsl(var(--muted));
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6875rem;
+            color: hsl(var(--muted-foreground));
+            text-align: center;
+            padding: 8px;
+        }
+
+        .fb-upload-preview img {
+            width: 100%;
+            height: 100%;
+            -o-object-fit: cover;
+               object-fit: cover;
+        }
+
+        .fb-service-card {
+            border: 1px solid hsl(var(--border));
+            border-radius: 10px;
+            padding: 14px 14px 16px;
+            margin-bottom: 12px;
+            background: hsl(var(--background));
+        }
+
+        .fb-service-card__head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .fb-service-card__title {
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        .fb-schedule-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 16px 0 10px;
+            color: hsl(var(--foreground));
+        }
+
+        .fb-day {
+            display: grid;
+            grid-template-columns: 92px 1fr;
+            gap: 8px 10px;
+            align-items: start;
+            padding: 8px 0;
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .fb-day:last-child {
+            border-bottom: none;
+        }
+
+        .fb-day-name {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: hsl(var(--muted-foreground));
+            padding-top: 6px;
+        }
+
+        .fb-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .fb-slot-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fb-time {
+            width: auto;
+            min-width: 7.5rem;
+            flex: 0 1 7.5rem;
+        }
+
+        .fb-slot-sep {
+            font-size: 0.75rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        .fb-row-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        /* Preview: match explore place-card */
+        .place-card {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid hsl(var(--border));
+            color: hsl(var(--card-foreground));
+        }
+
+        .place-card__image {
+            position: relative;
+            height: 152px;
+            background: hsl(var(--muted));
+        }
+
+        .place-card__cover {
+            width: 100%;
+            height: 100%;
+            -o-object-fit: cover;
+               object-fit: cover;
+        }
+
+        .place-card__badge {
+            position: absolute;
+            z-index: 2;
+            top: 12px;
+            left: 12px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            background: color-mix(in hsl, hsl(var(--accent)) 92%, transparent);
+            color: hsl(var(--accent-foreground));
+        }
+
+        .place-card__body {
+            padding: 12px 12px 14px;
+            background: hsl(var(--card));
+        }
+
+        .place-card__row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .place-card__name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: -0.015em;
+        }
+
+        .place-card__rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .place-card__rating svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .place-card__meta {
+            font-size: 0.75rem;
+            color: hsl(var(--muted-foreground));
+            margin-bottom: 8px;
+            line-height: 1.35;
+        }
+
+        .place-card__tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: hsl(var(--muted));
+            color: hsl(var(--muted-foreground));
+        }
+
+        .fb-preview-note {
+            font-size: 0.75rem;
+            color: hsl(var(--muted-foreground));
+            margin-top: 12px;
+            line-height: 1.4;
+        }
+    </style>
+  <link rel="stylesheet" crossorigin href="./assets/globals-XmYMcZV_.css">
+</head>
+<body class="bg-background text-foreground">
+    <header class="topbar">
+        <a href="/" class="logo" aria-label="QList home"
+            ><svg width="190" height="50" viewBox="0 0 170 40" fill="none" style="color: hsl(var(--primary));" xmlns="http://www.w3.org/2000/svg">
+  
+  <!-- Q -->
+  <circle cx="20" cy="20" r="16" stroke="currentColor" stroke-width="3"/>
+  
+  <!-- Tail (smooth, premium angle) -->
+  <path d="M26 29 L35 35 L49 23"
+        transform="translate(2 2)"
+        style="color: hsl(var(--cta));"
+        stroke="currentColor"
+        stroke-width="4.25"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  
+  <!-- Text (optical spacing + baseline tweak) -->
+  <text x="47.7" y="27"
+        font-family="Space Grotesk, sans-serif"
+        font-size="18"
+        font-weight="600"
+        fill="currentColor">
+    List
+  </text>
+
+</svg></a>
+        <div class="topbar__actions">
+            <a href="index.html" class="pill-btn">Back to app</a>
+        </div>
+    </header>
+
+    <main class="fb-wrap" id="main">
+        <div class="fb-head">
+            <h1>Register your business</h1>
+            <p>
+                This form is for owners listing on QList. Add your basics, services, and hours per service. Nothing is saved to a server yet — it is a structured preview only.
+            </p>
+        </div>
+
+        <div class="fb-grid">
+            <div class="fb-form-col">
+                <section class="fb-card" aria-labelledby="biz-info-title">
+                    <h2 id="biz-info-title" class="fb-section-title">Business info</h2>
+                    <div class="fb-field">
+                        <label class="fb-label" for="business-name">Business name</label>
+                        <input class="fb-input" type="text" id="business-name" name="business-name" placeholder="e.g. Northside Studio" autocomplete="organization" />
+                    </div>
+                    <div class="fb-field">
+                        <span class="fb-label" id="photo-label">Cover photo</span>
+                        <div class="fb-upload-row">
+                            <div class="fb-upload-preview" id="photo-preview" aria-hidden="true">No image</div>
+                            <div style="flex: 1; min-width: 0">
+                                <input type="file" id="business-photo" accept="image/*" aria-labelledby="photo-label" />
+                                <p class="fb-hint">Shown on your public card. You can change it anytime later.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fb-field">
+                        <label class="fb-label" for="business-location">Location</label>
+                        <input
+                            class="fb-input"
+                            type="text"
+                            id="business-location"
+                            name="business-location"
+                            placeholder="Neighborhood, city, or full address"
+                            autocomplete="street-address"
+                        />
+                        <p class="fb-hint">Map pin selection can plug in here later; a single line is enough for now.</p>
+                    </div>
+                </section>
+
+                <section class="fb-card" aria-labelledby="services-title">
+                    <h2 id="services-title" class="fb-section-title">Services</h2>
+                    <p class="fb-hint" style="margin-bottom: 14px">
+                        Each service has its own price, duration, and weekly hours. Add as many as you offer.
+                    </p>
+                    <div id="services-root"></div>
+                    <div class="fb-row-actions">
+                        <button type="button" class="pill-btn pill-btn--primary bg-primary" id="add-service-btn">Add service</button>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="fb-preview-col" aria-labelledby="preview-title">
+                <section class="fb-card fb-card--sticky">
+                    <h2 id="preview-title" class="fb-section-title">Card preview</h2>
+                    <article class="place-card bg-card" id="card-preview">
+                        <div class="place-card__image" id="preview-image-wrap">
+                            <span class="place-card__badge">New</span>
+                        </div>
+                        <div class="place-card__body">
+                            <div class="place-card__row">
+                                <h3 class="place-card__name" id="preview-name">Your business name</h3>
+                                <span class="place-card__rating" title="Preview only">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                                    </svg>
+                                    —
+                                </span>
+                            </div>
+                            <p class="place-card__meta" id="preview-meta">Add a location to show how it reads under your name.</p>
+                            <div class="place-card__tags" id="preview-tags">
+                                <span class="tag">Services appear here</span>
+                            </div>
+                        </div>
+                    </article>
+                    <p class="fb-preview-note">
+                        First lines of each service’s weekly hours appear below the tags so you can confirm each schedule is independent.
+                    </p>
+                    <div id="preview-schedules" class="fb-preview-note" style="margin-top: 8px"></div>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <script>
+        (function () {
+            var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+            function uid() {
+                if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+                return "s" + Date.now() + Math.random().toString(16).slice(2);
+            }
+
+            function defaultSlotsByDay() {
+                return DAYS.map(function (d, i) {
+                    if (i < 5) return [{ start: "09:00", end: "18:00" }];
+                    return [];
+                });
+            }
+
+            function emptyService() {
+                return {
+                    id: uid(),
+                    name: "",
+                    price: "",
+                    duration: "",
+                    slotsByDay: defaultSlotsByDay(),
+                };
+            }
+
+            var state = {
+                photoDataUrl: null,
+                services: [emptyService()],
+            };
+
+            var els = {
+                name: document.getElementById("business-name"),
+                location: document.getElementById("business-location"),
+                photo: document.getElementById("business-photo"),
+                photoPreview: document.getElementById("photo-preview"),
+                servicesRoot: document.getElementById("services-root"),
+                addService: document.getElementById("add-service-btn"),
+                previewName: document.getElementById("preview-name"),
+                previewMeta: document.getElementById("preview-meta"),
+                previewTags: document.getElementById("preview-tags"),
+                previewImageWrap: document.getElementById("preview-image-wrap"),
+                previewSchedules: document.getElementById("preview-schedules"),
+            };
+
+            function findService(id) {
+                for (var i = 0; i < state.services.length; i++) {
+                    if (state.services[i].id === id) return state.services[i];
+                }
+                return null;
+            }
+
+            function daySummary(slots) {
+                if (!slots || !slots.length) return "Closed";
+                return slots
+                    .map(function (s) {
+                        return (s.start || "?") + " – " + (s.end || "?");
+                    })
+                    .join(", ");
+            }
+
+            function renderServices() {
+                els.servicesRoot.innerHTML = state.services
+                    .map(function (svc, idx) {
+                        var daysHtml = DAYS.map(function (day, dIdx) {
+                            var slots = svc.slotsByDay[dIdx] || [];
+                            var slotsHtml = slots
+                                .map(function (slot, sIdx) {
+                                    return (
+                                        '<div class="fb-slot-row" data-slot-row data-sid="' +
+                                        svc.id +
+                                        '" data-day="' +
+                                        dIdx +
+                                        '" data-slot="' +
+                                        sIdx +
+                                        '">' +
+                                        '<input class="fb-input fb-time" type="time" aria-label="' +
+                                        day +
+                                        ' start" value="' +
+                                        (slot.start || "") +
+                                        '" data-field="start" />' +
+                                        '<span class="fb-slot-sep">to</span>' +
+                                        '<input class="fb-input fb-time" type="time" aria-label="' +
+                                        day +
+                                        ' end" value="' +
+                                        (slot.end || "") +
+                                        '" data-field="end" />' +
+                                        (slots.length > 1
+                                            ? '<button type="button" class="pill-btn pill-btn--sm pill-btn--danger pill-btn--ghost" data-remove-slot>Remove</button>'
+                                            : "") +
+                                        "</div>"
+                                    );
+                                })
+                                .join("");
+                            return (
+                                '<div class="fb-day">' +
+                                '<div class="fb-day-name">' +
+                                day +
+                                "</div>" +
+                                '<div class="fb-slots">' +
+                                slotsHtml +
+                                '<button type="button" class="pill-btn pill-btn--sm pill-btn--ghost" data-add-slot data-sid="' +
+                                svc.id +
+                                '" data-day="' +
+                                dIdx +
+                                '">+ Add hours</button>' +
+                                "</div>" +
+                                "</div>"
+                            );
+                        }).join("");
+
+                        return (
+                            '<div class="fb-service-card" data-service-id="' +
+                            svc.id +
+                            '">' +
+                            '<div class="fb-service-card__head">' +
+                            '<span class="fb-service-card__title">Service ' +
+                            (idx + 1) +
+                            "</span>" +
+                            (state.services.length > 1
+                                ? '<button type="button" class="pill-btn pill-btn--sm pill-btn--danger pill-btn--ghost" data-remove-service="' +
+                                  svc.id +
+                                  '">Remove service</button>'
+                                : "") +
+                            "</div>" +
+                            '<div class="fb-field">' +
+                            '<label class="fb-label" for="svc-name-' +
+                            svc.id +
+                            '">Service name</label>' +
+                            '<input class="fb-input" id="svc-name-' +
+                            svc.id +
+                            '" data-svc-field="name" data-sid="' +
+                            svc.id +
+                            '" type="text" placeholder="e.g. Signature haircut" value="' +
+                            escapeAttr(svc.name) +
+                            '" />' +
+                            "</div>" +
+                            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+                            '<div class="fb-field">' +
+                            '<label class="fb-label" for="svc-price-' +
+                            svc.id +
+                            '">Price <span style="font-weight:400;color:hsl(var(--muted-foreground))">(optional)</span></label>' +
+                            '<input class="fb-input" id="svc-price-' +
+                            svc.id +
+                            '" data-svc-field="price" data-sid="' +
+                            svc.id +
+                            '" type="text" placeholder="e.g. $85" value="' +
+                            escapeAttr(svc.price) +
+                            '" />' +
+                            "</div>" +
+                            '<div class="fb-field">' +
+                            '<label class="fb-label" for="svc-dur-' +
+                            svc.id +
+                            '">Duration <span style="font-weight:400;color:hsl(var(--muted-foreground))">(optional)</span></label>' +
+                            '<input class="fb-input" id="svc-dur-' +
+                            svc.id +
+                            '" data-svc-field="duration" data-sid="' +
+                            svc.id +
+                            '" type="text" placeholder="e.g. 60 min" value="' +
+                            escapeAttr(svc.duration) +
+                            '" />' +
+                            "</div>" +
+                            "</div>" +
+                            '<p class="fb-schedule-title">Schedule for this service</p>' +
+                            daysHtml +
+                            "</div>"
+                        );
+                    })
+                    .join("");
+            }
+
+            function escapeAttr(s) {
+                return String(s || "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/</g, "&lt;");
+            }
+
+            function escapeHtml(t) {
+                return String(t)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+            }
+
+            function updatePhotoPreview() {
+                if (state.photoDataUrl) {
+                    els.photoPreview.innerHTML = '<img src="' + state.photoDataUrl + '" alt="" />';
+                } else {
+                    els.photoPreview.innerHTML = "";
+                    els.photoPreview.textContent = "No image";
+                }
+                updateCardPreview();
+            }
+
+            function updateCardPreview() {
+                var name = els.name.value.trim() || "Your business name";
+                els.previewName.textContent = name;
+
+                var loc = els.location.value.trim();
+                var metaParts = [];
+                if (loc) metaParts.push(loc);
+                if (state.services.length && state.services[0].name.trim()) {
+                    metaParts.push(state.services[0].name.trim());
+                } else {
+                    metaParts.push("Add services to show under your location");
+                }
+                els.previewMeta.textContent = metaParts.join(" · ");
+
+                els.previewTags.innerHTML = "";
+                var tags = state.services
+                    .map(function (s) {
+                        return s.name.trim();
+                    })
+                    .filter(Boolean);
+                if (!tags.length) {
+                    var t = document.createElement("span");
+                    t.className = "tag";
+                    t.textContent = "Services appear here";
+                    els.previewTags.appendChild(t);
+                } else {
+                    tags.slice(0, 5).forEach(function (text) {
+                        var span = document.createElement("span");
+                        span.className = "tag";
+                        span.textContent = text;
+                        els.previewTags.appendChild(span);
+                    });
+                }
+
+                var wrap = els.previewImageWrap;
+                var existing = wrap.querySelector(".place-card__cover");
+                if (existing) existing.remove();
+                if (state.photoDataUrl) {
+                    var img = document.createElement("img");
+                    img.className = "place-card__cover";
+                    img.src = state.photoDataUrl;
+                    img.alt = "";
+                    wrap.insertBefore(img, wrap.firstChild);
+                }
+
+                els.previewSchedules.innerHTML = state.services
+                    .map(function (svc) {
+                        var title = svc.name.trim() || "Untitled service";
+                        var lines = DAYS.map(function (d, i) {
+                            return "<strong>" + d.slice(0, 3) + "</strong>: " + daySummary(svc.slotsByDay[i]);
+                        }).join("<br/>");
+                        return "<p style=\"margin-bottom:10px\"><strong>" + escapeHtml(title) + "</strong><br/>" + lines + "</p>";
+                    })
+                    .join("");
+            }
+
+            function bindServicesRoot() {
+                els.servicesRoot.onclick = function (e) {
+                    var t = e.target;
+                    if (!(t && t.closest)) return;
+                    var addBtn = t.closest("[data-add-slot]");
+                    if (addBtn) {
+                        var sid = addBtn.getAttribute("data-sid");
+                        var d = parseInt(addBtn.getAttribute("data-day"), 10);
+                        var svc = findService(sid);
+                        if (!svc) return;
+                        if (!svc.slotsByDay[d]) svc.slotsByDay[d] = [];
+                        svc.slotsByDay[d].push({ start: "09:00", end: "17:00" });
+                        renderServices();
+                        updateCardPreview();
+                        return;
+                    }
+                    var rmSlot = t.closest("[data-remove-slot]");
+                    if (rmSlot) {
+                        var row = rmSlot.closest("[data-slot-row]");
+                        if (!row) return;
+                        var sid2 = row.getAttribute("data-sid");
+                        var d2 = parseInt(row.getAttribute("data-day"), 10);
+                        var s2 = parseInt(row.getAttribute("data-slot"), 10);
+                        var svc2 = findService(sid2);
+                        if (!svc2 || !svc2.slotsByDay[d2]) return;
+                        svc2.slotsByDay[d2].splice(s2, 1);
+                        if (!svc2.slotsByDay[d2].length) svc2.slotsByDay[d2] = [];
+                        renderServices();
+                        updateCardPreview();
+                        return;
+                    }
+                    var rmSvc = t.closest("[data-remove-service]");
+                    if (rmSvc) {
+                        var id = rmSvc.getAttribute("data-remove-service");
+                        state.services = state.services.filter(function (s) {
+                            return s.id !== id;
+                        });
+                        if (!state.services.length) state.services.push(emptyService());
+                        renderServices();
+                        updateCardPreview();
+                    }
+                };
+
+                els.servicesRoot.oninput = function (e) {
+                    var inp = e.target;
+                    if (inp && inp.getAttribute("data-svc-field")) {
+                        var sid = inp.getAttribute("data-sid");
+                        var svc = findService(sid);
+                        if (svc) svc[inp.getAttribute("data-svc-field")] = inp.value;
+                        updateCardPreview();
+                        return;
+                    }
+                    var row = inp.closest && inp.closest("[data-slot-row]");
+                    if (row) {
+                        var sid3 = row.getAttribute("data-sid");
+                        var d3 = parseInt(row.getAttribute("data-day"), 10);
+                        var s3 = parseInt(row.getAttribute("data-slot"), 10);
+                        var field = inp.getAttribute("data-field");
+                        var svc3 = findService(sid3);
+                        if (svc3 && svc3.slotsByDay[d3] && svc3.slotsByDay[d3][s3]) {
+                            svc3.slotsByDay[d3][s3][field] = inp.value;
+                        }
+                        updateCardPreview();
+                    }
+                };
+            }
+
+            els.addService.onclick = function () {
+                state.services.push(emptyService());
+                renderServices();
+                updateCardPreview();
+            };
+
+            els.name.addEventListener("input", updateCardPreview);
+            els.location.addEventListener("input", updateCardPreview);
+
+            els.photo.addEventListener("change", function () {
+                var f = els.photo.files && els.photo.files[0];
+                if (!f) {
+                    state.photoDataUrl = null;
+                    updatePhotoPreview();
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function () {
+                    state.photoDataUrl = reader.result;
+                    updatePhotoPreview();
+                };
+                reader.readAsDataURL(f);
+            });
+
+            renderServices();
+            bindServicesRoot();
+            updateCardPreview();
+        })();
+    </script>
+</body>
+</html>

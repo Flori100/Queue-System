@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 140" width="180" height="28" role="img" aria-labelledby="qlistLogoTitle" style="color: hsl(var(--primary));">
+  <title id="qlistLogoTitle">QList</title>
+  <g fill="currentColor">
+    <path
+      fill-rule="evenodd"
+      d="M324 70A54 54 0 1 1 215.9 70A54 54 0 1 1 324 70M306 70A36 36 0 1 0 234 70A36 36 0 1 0 306 70"
+    />
+    <path d="M292 108 L308 122 L432 58 L414 46 Z" />
+  </g>
+  <text
+    x="364"
+    y="96"
+    fill="currentColor"
+    font-family="Space Grotesk, Inter, sans-serif"
+    font-size="72"
+    font-weight="600"
+    letter-spacing="-6"
+  >List</text>
+  <path style="color: hsl(var(--cta));" fill="currentColor" d="M436 54 L452 66 L468 48 Z" />
+</svg>

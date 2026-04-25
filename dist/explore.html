@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Browse every category on QList—then open listings and book." />
+    <title>All categories – QList</title>
+    <link rel="icon" href="./logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Space+Grotesk:wght@600&display=swap"
+        rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./tokens.css" />
+    <script>
+        (function () {
+            try {
+                var q = new URLSearchParams(window.location.search).get("category");
+                if (q && String(q).trim()) {
+                    // window.location.replace("./search.html?category=" + encodeURIComponent(String(q).trim()));
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <script>
+        (function () {
+            try {
+                document.documentElement.classList.remove("dark");
+                document.documentElement.setAttribute("data-theme", "light");
+            } catch (e) {}
+        })();
+    </script>
+    <style>
+        :root {
+            --radius-sm: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            background-color: hsl(var(--background));
+            color-scheme: light;
+        }
+
+        html:not(.dark),
+        html:not(.dark) body {
+            background-color: hsl(var(--background)) !important;
+        }
+
+        html.dark {
+            color-scheme: dark;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            min-height: 100dvh;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .explore-shell {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: clamp(20px, 4vw, 40px) clamp(16px, 3vw, 28px) 56px;
+        }
+
+        .explore-top {
+            margin-bottom: clamp(22px, 3.5vw, 32px);
+        }
+
+        .explore-back {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: hsl(var(--muted-foreground));
+            margin-bottom: 14px;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .explore-back:hover {
+            color: hsl(var(--foreground));
+        }
+
+        .explore-title {
+            font-size: clamp(1.35rem, 3vw, 1.75rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .explore-lede {
+            font-size: 0.9375rem;
+            line-height: 1.45;
+            color: hsl(var(--muted-foreground));
+            max-width: 42rem;
+        }
+
+        /* Same component tokens as home “Browse by category” */
+        .home-category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .home-category-grid > li {
+            min-width: 0;
+        }
+
+        @media (min-width: 560px) {
+            .home-category-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 16px;
+            }
+        }
+
+        @media (min-width: 900px) {
+            .home-category-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        .home-category-grid-card {
+            position: relative;
+            display: block;
+            width: 100%;
+            padding: 0;
+            border: none;
+            border-radius: 14px;
+            text-align: left;
+            color: #fff;
+            background: rgb(15 23 42);
+            box-shadow:
+                0 1px 2px rgb(15 23 42 / 0.06),
+                0 4px 14px rgb(15 23 42 / 0.08);
+            overflow: hidden;
+            aspect-ratio: 5 / 3;
+            max-height: 148px;
+            transition:
+                box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @media (min-width: 560px) {
+            .home-category-grid-card {
+                max-height: 132px;
+            }
+        }
+
+        button.home-category-grid-card,
+        a.home-category-grid-card {
+            cursor: pointer;
+            font: inherit;
+            -webkit-appearance: none;
+               -moz-appearance: none;
+                    appearance: none;
+            text-decoration: none;
+        }
+
+        .home-category-grid-card__media {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .home-category-grid-card__img {
+            width: 100%;
+            height: 100%;
+            -o-object-fit: cover;
+               object-fit: cover;
+            transform: scale(1.001);
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            background: rgb(30 41 59);
+        }
+
+        .home-category-grid-card__overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgb(15 23 42 / 0.2) 0%,
+                rgb(15 23 42 / 0.35) 38%,
+                rgb(15 23 42 / 0.78) 100%
+            );
+            transition: background 0.28s ease;
+        }
+
+        .home-category-grid-card__content {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            padding: 10px 12px 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            text-shadow: 0 1px 10px rgb(0 0 0 / 0.35);
+        }
+
+        .home-category-grid-card__label {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            color: #fff;
+        }
+
+        .home-category-grid-card__hint {
+            font-size: 0.6875rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            line-height: 1.25;
+            color: rgb(255 255 255 / 0.88);
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .home-category-grid-card:hover {
+                transform: translateY(-4px);
+                box-shadow:
+                    0 4px 8px rgb(15 23 42 / 0.08),
+                    0 18px 40px rgb(15 23 42 / 0.2);
+            }
+
+            .home-category-grid-card:hover .home-category-grid-card__img {
+                transform: scale(1.07);
+            }
+
+            .home-category-grid-card:hover .home-category-grid-card__overlay {
+                background: linear-gradient(
+                    180deg,
+                    rgb(15 23 42 / 0.28) 0%,
+                    rgb(15 23 42 / 0.42) 38%,
+                    rgb(15 23 42 / 0.86) 100%
+                );
+            }
+        }
+
+        .home-category-grid-card:active {
+            transform: translateY(-1px) scale(0.99);
+            box-shadow:
+                0 2px 6px rgb(15 23 42 / 0.1),
+                0 8px 20px rgb(15 23 42 / 0.12);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .home-category-grid-card:active {
+                transform: none;
+            }
+        }
+
+        .home-category-grid-card:focus-visible {
+            outline: none;
+            box-shadow:
+                0 0 0 2px hsl(var(--background)),
+                0 0 0 4px color-mix(in hsl, hsl(var(--ring)), transparent 25%),
+                0 8px 24px rgb(15 23 42 / 0.15);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .home-category-grid-card,
+            .home-category-grid-card__img,
+            .home-category-grid-card__overlay {
+                transition-duration: 0.01ms;
+            }
+
+            @media (hover: hover) and (pointer: fine) {
+                .home-category-grid-card:hover {
+                    transform: none;
+                }
+
+                .home-category-grid-card:hover .home-category-grid-card__img {
+                    transform: none;
+                }
+            }
+        }
+    </style>
+  <script type="module" crossorigin src="./assets/preload-helper-lMf9uHy8.js"></script>
+  <script type="module" crossorigin src="./assets/main-Hwan-inx.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/globals-XmYMcZV_.css">
+</head>
+<body>
+    <main class="explore-shell explore-all-categories">
+        <header class="explore-top">
+            <a href="./index.html" class="explore-back">← Back to home</a>
+            <h1 class="explore-title" id="explore-heading">All categories</h1>
+            <p class="explore-lede">Same tiles as Browse by category—open any category to see listings and book.</p>
+        </header>
+
+        <ul class="home-category-grid" aria-labelledby="explore-heading">
+            <li>
+                <a
+                    class="home-category-grid-card home-category-grid-card--barber"
+                    href="./search.html?category=barbershop"
+                    aria-label="Open Barber businesses in search"
+                >
+                    <span class="home-category-grid-card__media" aria-hidden="true">
+                        <img
+                            class="home-category-grid-card__img"
+                            src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                            alt=""
+                            width="800"
+                            height="480"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="home-category-grid-card__overlay"></span>
+                    </span>
+                    <span class="home-category-grid-card__content">
+                        <span class="home-category-grid-card__label">Barber</span>
+                        <span class="home-category-grid-card__hint">120+ places</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a
+                    class="home-category-grid-card home-category-grid-card--hair"
+                    href="./search.html?category=hair-salon"
+                    aria-label="Open Hair salon businesses in search"
+                >
+                    <span class="home-category-grid-card__media" aria-hidden="true">
+                        <img
+                            class="home-category-grid-card__img"
+                            src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                            alt=""
+                            width="800"
+                            height="480"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="home-category-grid-card__overlay"></span>
+                    </span>
+                    <span class="home-category-grid-card__content">
+                        <span class="home-category-grid-card__label">Hair salon</span>
+                        <span class="home-category-grid-card__hint">Available today</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a
+                    class="home-category-grid-card home-category-grid-card--nails"
+                    href="./search.html?category=nails"
+                    aria-label="Open Nails businesses in search"
+                >
+                    <span class="home-category-grid-card__media" aria-hidden="true">
+                        <img
+                            class="home-category-grid-card__img"
+                            src="https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                            alt=""
+                            width="800"
+                            height="480"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="home-category-grid-card__overlay"></span>
+                    </span>
+                    <span class="home-category-grid-card__content">
+                        <span class="home-category-grid-card__label">Nails</span>
+                        <span class="home-category-grid-card__hint">85+ studios</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a
+                    class="home-category-grid-card home-category-grid-card--spa"
+                    href="./search.html?category=spa"
+                    aria-label="Open Spa and massage businesses in search"
+                >
+                    <span class="home-category-grid-card__media" aria-hidden="true">
+                        <img
+                            class="home-category-grid-card__img"
+                            src="https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                            alt=""
+                            width="800"
+                            height="480"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="home-category-grid-card__overlay"></span>
+                    </span>
+                    <span class="home-category-grid-card__content">
+                        <span class="home-category-grid-card__label">Spa &amp; massage</span>
+                        <span class="home-category-grid-card__hint">Same-week slots</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a
+                    class="home-category-grid-card home-category-grid-card--gym"
+                    href="./search.html?category=fitness"
+                    aria-label="Open Gym and Fitness businesses in search"
+                >
+                    <span class="home-category-grid-card__media" aria-hidden="true">
+                        <img
+                            class="home-category-grid-card__img"
+                            src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                            alt=""
+                            width="800"
+                            height="480"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="home-category-grid-card__overlay"></span>
+                    </span>
+                    <span class="home-category-grid-card__content">
+                        <span class="home-category-grid-card__label">Gym / Fitness</span>
+                        <span class="home-category-grid-card__hint">40+ gyms</span>
+                    </span>
+                </a>
+            </li>
+            
+            <li>
+                <a
+                    class="home-category-grid-card home-category-grid-card--dentist"
+                    href="./search.html?category=dentist"
+                    aria-label="Open Dentist businesses in search"
+                >
+                    <span class="home-category-grid-card__media" aria-hidden="true">
+                        <img
+                            class="home-category-grid-card__img"
+                            src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                            alt=""
+                            width="800"
+                            height="480"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="home-category-grid-card__overlay"></span>
+                    </span>
+                    <span class="home-category-grid-card__content">
+                        <span class="home-category-grid-card__label">Dentist</span>
+                        <span class="home-category-grid-card__hint">30+ clinics</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a
+                    class="home-category-grid-card home-category-grid-card--derm"
+                    href="./search.html?category=dermatology"
+                    aria-label="Open Dermatology businesses in search"
+                >
+                    <span class="home-category-grid-card__media" aria-hidden="true">
+                        <img
+                            class="home-category-grid-card__img"
+                            src="https://images.unsplash.com/photo-1570172617284-fa906024435a?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                            alt=""
+                            width="800"
+                            height="480"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="home-category-grid-card__overlay"></span>
+                    </span>
+                    <span class="home-category-grid-card__content">
+                        <span class="home-category-grid-card__label">Dermatology</span>
+                        <span class="home-category-grid-card__hint">New this week</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a
+                    class="home-category-grid-card home-category-grid-card--taxi"
+                    href="./search.html?category=taxi"
+                    aria-label="Open Taxi and rides in search"
+                >
+                    <span class="home-category-grid-card__media" aria-hidden="true">
+                        <img
+                            class="home-category-grid-card__img"
+                            src="https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&amp;fit=crop&amp;w=800&amp;q=80"
+                            alt=""
+                            width="800"
+                            height="480"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="home-category-grid-card__overlay"></span>
+                    </span>
+                    <span class="home-category-grid-card__content">
+                        <span class="home-category-grid-card__label">Taxi &amp; rides</span>
+                        <span class="home-category-grid-card__hint">On-demand pickups</span>
+                    </span>
+                </a>
+            </li>
+        </ul>
+    </main>
+
+    <script src="./qlist-auth-standalone.js"></script>
+</body>
+</html>
