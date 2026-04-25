@@ -42,6 +42,24 @@
                         @csrf
 
                         <div>
+                            <x-input-label for="service_provider_id" :value="__('Service Provider')" />
+                            <select
+                                id="service_provider_id"
+                                name="service_provider_id"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                required
+                            >
+                                <option value="">{{ __('Select provider') }}</option>
+                                @foreach ($serviceProviders as $provider)
+                                    <option value="{{ $provider->id }}" @selected((string) old('service_provider_id') === (string) $provider->id)>
+                                        {{ $provider->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <x-input-error :messages="$errors->get('service_provider_id')" class="mt-2" />
+                        </div>
+
+                        <div>
                             <x-input-label for="service_type" :value="__('Service')" />
                             <select
                                 id="service_type"
@@ -105,7 +123,7 @@
                                 <th class="py-2 pr-4">{{ __('Priority') }}</th>
                                 <th class="py-2 pr-4">{{ __('Status') }}</th>
                                 <th class="py-2 pr-4">{{ __('Customer') }}</th>
-                                <th class="py-2 pr-4">{{ __('Assigned') }}</th>
+                                <th class="py-2 pr-4">{{ __('Provider') }}</th>
                                 @if ($canManageTickets)
                                     <th class="py-2 pr-4">{{ __('Actions') }}</th>
                                 @elseif ($canCreateTickets)
@@ -133,7 +151,7 @@
                                         </span>
                                     </td>
                                     <td class="py-3 pr-4 text-gray-700">{{ $ticket->customer?->name ?? '-' }}</td>
-                                    <td class="py-3 pr-4 text-gray-700">{{ $ticket->assignedStaff?->name ?? '-' }}</td>
+                                    <td class="py-3 pr-4 text-gray-700">{{ $ticket->serviceProvider?->name ?? '-' }}</td>
                                     @if ($canManageTickets)
                                         <td class="py-3 pr-4">
                                             <form method="POST" action="{{ route('queue.update-status', $ticket) }}" class="flex items-center gap-2">

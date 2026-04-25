@@ -52,7 +52,7 @@ class QueueTicket extends Model
         'ticket_number',
         'queue_number',
         'customer_id',
-        'assigned_to',
+        'service_provider_id',
         'service_type',
         'priority',
         'status',
@@ -95,7 +95,12 @@ class QueueTicket extends Model
 
     public function assignedStaff(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'assigned_to');
+        return $this->serviceProvider();
+    }
+
+    public function serviceProvider(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'service_provider_id');
     }
 
     public function scopeWaiting(Builder $query): Builder

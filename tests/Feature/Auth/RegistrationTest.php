@@ -30,17 +30,17 @@ class RegistrationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
-    public function test_new_admin_users_are_redirected_to_admin_dashboard(): void
+    public function test_new_service_provider_users_are_redirected_to_provider_dashboard(): void
     {
         $response = $this->post('/register', [
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'role' => 'admin',
+            'name' => 'Provider User',
+            'email' => 'provider@example.com',
+            'role' => 'service_provider',
             'password' => 'password',
             'password_confirmation' => 'password',
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/provider/dashboard');
     }
 }

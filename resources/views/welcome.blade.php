@@ -5,22 +5,14 @@
             <p class="mt-2 text-sm text-gray-600">Book tickets, manage service queues, and route users by role.</p>
         </div>
 
-        <div class="grid gap-4">
+        <div class="grid gap-4 sm:grid-cols-2">
+            <div class="rounded-lg border border-gray-200 bg-white p-4">
+                <h2 class="text-sm font-semibold text-gray-900">Service Provider</h2>
+                <p class="mt-1 text-sm text-gray-600">Offer services and manage client reservations (for example: a barber).</p>
+            </div>
             <div class="rounded-lg border border-gray-200 bg-white p-4">
                 <h2 class="text-sm font-semibold text-gray-900">Customer</h2>
-                <p class="mt-1 text-sm text-gray-600">Create new queue tickets and track status.</p>
-            </div>
-            <div class="rounded-lg border border-gray-200 bg-white p-4">
-                <h2 class="text-sm font-semibold text-gray-900">Reception</h2>
-                <p class="mt-1 text-sm text-gray-600">Check in queued tickets and assign priorities.</p>
-            </div>
-            <div class="rounded-lg border border-gray-200 bg-white p-4">
-                <h2 class="text-sm font-semibold text-gray-900">Staff</h2>
-                <p class="mt-1 text-sm text-gray-600">Serve queued tickets and mark progress.</p>
-            </div>
-            <div class="rounded-lg border border-gray-200 bg-white p-4">
-                <h2 class="text-sm font-semibold text-gray-900">Admin</h2>
-                <p class="mt-1 text-sm text-gray-600">Monitor volume, waiting times, and ticket distribution.</p>
+                <p class="mt-1 text-sm text-gray-600">Choose a provider and reserve a service appointment.</p>
             </div>
         </div>
 

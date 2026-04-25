@@ -3,11 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\QueueTicket;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\QueueTicket;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -19,18 +19,12 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    public const ROLE_ADMIN = 'admin';
-
-    public const ROLE_STAFF = 'staff';
-
-    public const ROLE_RECEPTIONIST = 'receptionist';
+    public const ROLE_SERVICE_PROVIDER = 'service_provider';
 
     public const ROLE_CUSTOMER = 'customer';
 
     public const ROLES = [
-        self::ROLE_ADMIN,
-        self::ROLE_STAFF,
-        self::ROLE_RECEPTIONIST,
+        self::ROLE_SERVICE_PROVIDER,
         self::ROLE_CUSTOMER,
     ];
 
@@ -50,9 +44,7 @@ class User extends Authenticatable
     public function dashboardRouteName(): string
     {
         return match ($this->role) {
-            self::ROLE_ADMIN => 'admin.dashboard',
-            self::ROLE_STAFF => 'staff.dashboard',
-            self::ROLE_RECEPTIONIST => 'reception.dashboard',
+            self::ROLE_SERVICE_PROVIDER => 'provider.dashboard',
             default => 'dashboard',
         };
     }
@@ -60,5 +52,10 @@ class User extends Authenticatable
     public function queueTickets(): HasMany
     {
         return $this->hasMany(QueueTicket::class, 'customer_id');
+    }
+
+    public function reservationsAsProvider(): HasMany
+    {
+        return $this->hasMany(QueueTicket::class, 'service_provider_id');
     }
 }
